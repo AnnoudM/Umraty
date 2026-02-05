@@ -14,7 +14,7 @@ import SwiftUI
 struct UmratyApp: App {
     var body: some Scene {
         WindowGroup {
-            CharacterSelectionView()
+         mainPage()
         }
     }
 }

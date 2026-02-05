@@ -8,7 +8,7 @@ struct CharacterSelectionView: View {
         NavigationStack(path: $path) {
             GeometryReader { geo in
                 ZStack {
-                    Color(red: 0.95, green: 0.98, blue: 0.94)
+                    Color(red: 0.85, green: 0.93, blue: 0.85)
                         .ignoresSafeArea()
                     
                     VStack {
