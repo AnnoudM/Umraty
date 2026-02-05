@@ -2,8 +2,6 @@ import SwiftUI
 
 struct CharacterSelectionView: View {
 
-    @State private var selectedGender: ChildGender? = nil
-
     var body: some View {
         NavigationStack {
             GeometryReader { geo in
@@ -23,9 +21,7 @@ struct CharacterSelectionView: View {
 
                         HStack(spacing: geo.size.width * 0.08) {
 
-                            Button {
-                                selectedGender = .boy
-                            } label: {
+                            NavigationLink(value: ChildGender.boy) {
                                 Image("boy")
                                     .resizable()
                                     .scaledToFit()
@@ -34,9 +30,7 @@ struct CharacterSelectionView: View {
                                     .shadow(radius: 4)
                             }
 
-                            Button {
-                                selectedGender = .girl
-                            } label: {
+                            NavigationLink(value: ChildGender.girl) {
                                 Image("girl")
                                     .resizable()
                                     .scaledToFit()
@@ -50,13 +44,12 @@ struct CharacterSelectionView: View {
                     }
                 }
             }
-            .navigationDestination(item: $selectedGender) { gender in
+            .navigationDestination(for: ChildGender.self) { gender in
                 SecondPage(selectedGender: gender)
             }
         }
     }
 }
-
 
 #Preview {
     CharacterSelectionView()
