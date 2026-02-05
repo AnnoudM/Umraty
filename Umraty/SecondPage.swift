@@ -1,92 +1,81 @@
-
-
 import SwiftUI
-import UIKit
 
 struct SecondPage: View {
 
+    let selectedGender: ChildGender
+
     var body: some View {
-        NavigationStack {
-            GeometryReader { geo in
-                let w = geo.size.width
-                let h = geo.size.height
+        GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
 
-                let circleSize = min(w, h) * 0.23
-                let pillWidth  = circleSize * 1.7
-                let pillHeight = circleSize * 1.05
+            let circleSize = min(w, h) * 0.23
+            let pillWidth  = circleSize * 1.7
+            let pillHeight = circleSize * 1.05
 
-                ZStack {
-                    Color(red: 0.94, green: 0.98, blue: 0.95)
-                        .ignoresSafeArea()
+            ZStack {
+                Color(red: 0.94, green: 0.98, blue: 0.95)
+                    .ignoresSafeArea()
 
-                    VStack(spacing: h * 0.08) {
+                VStack(spacing: h * 0.08) {
 
-                        HStack(spacing: w * 0.10) {
+                    HStack(spacing: w * 0.10) {
 
-                            NavigationLink(destination: GamesPage()) {
-                                MenuCircleButton(
-                                    imageName: "image1 1",
-                                    title: "العاب",
-                                    circleSize: circleSize,
-                                    pillWidth: pillWidth,
-                                    pillHeight: pillHeight,
-
-                                    // ✅ Adjust image1 alone
-                                    imageScale: 1.20,
-                                    imageX: 3,
-                                    imageY: 0
-                                )
-                            }
-
-                            NavigationLink(destination: LearnUmrahPage()) {
-                                MenuCircleButton(
-                                    imageName: "image2",
-                                    title: "تعلم العمرة",
-                                    circleSize: circleSize,
-                                    pillWidth: pillWidth,
-                                    pillHeight: pillHeight,
-
-                                    // ✅ Adjust image2 alone
-                                    imageScale: 1.90,
-                                    imageX: 3,
-                                    imageY: 0
-                                )
-                            }
-                        }
-
-                        NavigationLink(destination: PrayersPage()) {
-                            MenuCircleButton(
-                                imageName: "image3",
-                                title: "أدعية",
+                        NavigationLink(destination: GamesPage()) {
+                            SecondMenuCircleButton(
+                                imageName: "image1 1",
+                                title: "العاب",
                                 circleSize: circleSize,
                                 pillWidth: pillWidth,
                                 pillHeight: pillHeight,
-
-                                // ✅ Adjust image3 alone
-                                imageScale: 1.90,
+                                imageScale: 1.20,
                                 imageX: 3,
                                 imageY: 0
                             )
                         }
 
-                        Spacer()
+                        // ✅ تعلم العمرة -> UmrahPathView (مع الجندر)
+                        NavigationLink(destination: UmrahPathView(selectedGender: selectedGender)) {
+                            SecondMenuCircleButton(
+                                imageName: "image2",
+                                title: "تعلم العمرة",
+                                circleSize: circleSize,
+                                pillWidth: pillWidth,
+                                pillHeight: pillHeight,
+                                imageScale: 1.90,
+                                imageX: 3,
+                                imageY: 0
+                            )
+                        }
                     }
-                    .padding(.top, h * 0.12)
-                    .padding(.horizontal, w * 0.08)
+
+                    // ✅ أدعية -> Duaa
+                    NavigationLink(destination: Duaa()) {
+                        SecondMenuCircleButton(
+                            imageName: "image3",
+                            title: "أدعية",
+                            circleSize: circleSize,
+                            pillWidth: pillWidth,
+                            pillHeight: pillHeight,
+                            imageScale: 1.90,
+                            imageX: 3,
+                            imageY: 0
+                        )
+                    }
+
+                    Spacer()
                 }
-            }
-            .toolbar(.hidden, for: .navigationBar)
-            .overlay(alignment: .topLeading) {
-                BackButton()
-                    .padding(.top, 18)
-                    .padding(.leading, 18)
+                .padding(.top, h * 0.12)
+                .padding(.horizontal, w * 0.08)
             }
         }
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
-// MARK: - Menu Button (each image controlled alone)
-struct MenuCircleButton: View {
+
+// MARK: - زر الدائرة (اسم مختلف لتفادي التعارض)
+struct SecondMenuCircleButton: View {
 
     let imageName: String
     let title: String
@@ -95,7 +84,6 @@ struct MenuCircleButton: View {
     let pillWidth: CGFloat
     let pillHeight: CGFloat
 
-    // ✅ Per-image controls
     let imageScale: CGFloat
     let imageX: CGFloat
     let imageY: CGFloat
@@ -115,27 +103,13 @@ struct MenuCircleButton: View {
                     .fill(Color(red: 0.86, green: 0.94, blue: 0.88))
                     .frame(width: circleSize, height: circleSize)
 
-                // Base frame (keeps things consistent)
-                if let uiImage = UIImage(named: cleanName) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: circleSize * 0.78, height: circleSize * 0.78)
-                        .scaleEffect(imageScale)          // ✅ size per image
-                        .offset(x: imageX, y: imageY)     // ✅ move per image
-                        .allowsHitTesting(false)
-                } else {
-                    Image(systemName: "photo")
-                        .font(.system(size: circleSize * 0.35, weight: .semibold))
-                        .foregroundColor(.black.opacity(0.25))
-                        .overlay(
-                            Text(cleanName)
-                                .font(.caption2)
-                                .foregroundColor(.black.opacity(0.35))
-                                .offset(y: circleSize * 0.30)
-                        )
-                        .allowsHitTesting(false)
-                }
+                Image(cleanName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: circleSize * 0.78, height: circleSize * 0.78)
+                    .scaleEffect(imageScale)
+                    .offset(x: imageX, y: imageY)
+                    .allowsHitTesting(false)
             }
 
             Text(title)
@@ -146,12 +120,14 @@ struct MenuCircleButton: View {
     }
 }
 
-// MARK: - Back Button
-struct BackButton: View {
+// MARK: - زر الرجوع
+struct SecondBackButton: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        Button { dismiss() } label: {
+        Button {
+            dismiss()
+        } label: {
             Image(systemName: "chevron.left")
                 .font(.system(size: 22, weight: .bold))
                 .foregroundColor(.black.opacity(0.65))
@@ -161,16 +137,16 @@ struct BackButton: View {
     }
 }
 
-// MARK: - Dummy Pages
-struct GamesPage: View { var body: some View { Text("صفحة الألعاب").font(.largeTitle) } }
-struct LearnUmrahPage: View { var body: some View { Text("صفحة تعلم العمرة").font(.largeTitle) } }
-struct PrayersPage: View { var body: some View { Text("صفحة الأدعية").font(.largeTitle) } }
-
-// MARK: - Preview
-struct SecondPage_Previews: PreviewProvider {
-    static var previews: some View {
-        SecondPage()
-            .previewDevice("iPad (11-inch)")
+// MARK: - صفحة مؤقتة للألعاب
+struct GamesPage: View {
+    var body: some View {
+        Text("صفحة الألعاب")
+            .font(.largeTitle)
     }
 }
 
+// MARK: - Preview
+#Preview {
+    SecondPage(selectedGender: .boy)
+        .previewDevice("iPad (11-inch)")
+}
