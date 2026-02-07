@@ -2,6 +2,8 @@ import SwiftUI
 
 struct CharacterSelectionView: View {
 
+    @AppStorage("selected_gender") private var savedGender: String = ""
+
     var body: some View {
         NavigationStack {
             GeometryReader { geo in
@@ -21,7 +23,12 @@ struct CharacterSelectionView: View {
 
                         HStack(spacing: geo.size.width * 0.08) {
 
-                            NavigationLink(value: ChildGender.boy) {
+                            NavigationLink {
+                                SecondPage(selectedGender: .boy)
+                                    .onAppear {
+                                        savedGender = ChildGender.boy.rawValue
+                                    }
+                            } label: {
                                 Image("boy")
                                     .resizable()
                                     .scaledToFit()
@@ -30,7 +37,12 @@ struct CharacterSelectionView: View {
                                     .shadow(radius: 4)
                             }
 
-                            NavigationLink(value: ChildGender.girl) {
+                            NavigationLink {
+                                SecondPage(selectedGender: .girl)
+                                    .onAppear {
+                                        savedGender = ChildGender.girl.rawValue
+                                    }
+                            } label: {
                                 Image("girl")
                                     .resizable()
                                     .scaledToFit()
@@ -44,9 +56,7 @@ struct CharacterSelectionView: View {
                     }
                 }
             }
-            .navigationDestination(for: ChildGender.self) { gender in
-                SecondPage(selectedGender: gender)
-            }
+            .toolbar(.hidden, for: .navigationBar)
         }
     }
 }

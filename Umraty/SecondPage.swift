@@ -37,10 +37,7 @@ struct SecondPage: View {
                             }
 
                             NavigationLink(
-                                destination: UmrahPathView(
-                                    selectedGender: selectedGender,
-                                    navPath: $umrahNavPath
-                                )
+                                destination: UmrahPathView(selectedGender: selectedGender)
                             ) {
                                 SecondMenuCircleButton(
                                     imageName: "image2",
@@ -75,7 +72,6 @@ struct SecondPage: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
-            // ✅ هنا المكان الصح
             .navigationDestination(for: StepID.self) { stepID in
                 UmrahStepRouterView(
                     selectedGender: selectedGender,
@@ -132,7 +128,6 @@ struct SecondMenuCircleButton: View {
     }
 }
 
-// MARK: - صفحة مؤقتة للألعاب
 struct GamesPage: View {
     var body: some View {
         Text("صفحة الألعاب")
