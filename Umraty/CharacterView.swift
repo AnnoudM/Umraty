@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CharacterSelectionView: View {
 
-    @State private var selectedGender: ChildGender? = nil
+    @AppStorage("selected_gender") private var savedGender: String = ""
 
     var body: some View {
         NavigationStack {
@@ -23,8 +23,11 @@ struct CharacterSelectionView: View {
 
                         HStack(spacing: geo.size.width * 0.08) {
 
-                            Button {
-                                selectedGender = .boy
+                            NavigationLink {
+                                SecondPage(selectedGender: .boy)
+                                    .onAppear {
+                                        savedGender = ChildGender.boy.rawValue
+                                    }
                             } label: {
                                 Image("boy")
                                     .resizable()
@@ -34,8 +37,11 @@ struct CharacterSelectionView: View {
                                     .shadow(radius: 4)
                             }
 
-                            Button {
-                                selectedGender = .girl
+                            NavigationLink {
+                                SecondPage(selectedGender: .girl)
+                                    .onAppear {
+                                        savedGender = ChildGender.girl.rawValue
+                                    }
                             } label: {
                                 Image("girl")
                                     .resizable()
@@ -50,13 +56,10 @@ struct CharacterSelectionView: View {
                     }
                 }
             }
-            .navigationDestination(item: $selectedGender) { gender in
-                SecondPage(selectedGender: gender)
-            }
+            .toolbar(.hidden, for: .navigationBar)
         }
     }
 }
-
 
 #Preview {
     CharacterSelectionView()
