@@ -9,7 +9,7 @@ struct FirstSai: View {
         ("محمد", "لأن السعي قصة جميلة بدأت مع السيدة هاجر. كانت تبحث عن الماء لابنها إسماعيل."),
         ("نورة", "وماذا فعلت؟"),
         ("محمد", "مشت بين جبل الصفا وجبل المروة سبع مرات. ثم ظهر ماء زمزم."),
-        ("نورة", "إذن نحن نسعى مثلها؟"),
+        ("نورة", "إذًا نحن نسعى مثلها؟"),
         ("محمد", "نعم يا نورة، نسعى مثلها في الحج والعمرة لنطيع الله ونتذكر قصتها الجميلة")
     ]
 
@@ -28,7 +28,8 @@ struct FirstSai: View {
                         .font(.system(size: geo.size.width * 0.08, weight: .bold))
                         .foregroundColor(.olive)
 
-                    if stage == 0 {
+                    // المرحلة 0: الحوار
+                    if stage == 0 && currentIndex < dialogues.count {
                         HStack(spacing: geo.size.width * 0.1) {
 
                             VStack(alignment: .leading, spacing: 12) {
@@ -67,6 +68,7 @@ struct FirstSai: View {
                         }
                     }
 
+                    // المرحلة 1: زر البدء
                     if stage == 1 {
                         Button("ابدأ السعي") {
                             stage = 2
@@ -76,6 +78,12 @@ struct FirstSai: View {
                         .background(Color.olive)
                         .foregroundColor(.white)
                         .cornerRadius(14)
+                    }
+
+                    // المرحلة 2: صفحة اللعبة
+                    if stage == 2 {
+                        Sai()
+                            .frame(height: geo.size.height * 0.75)
                     }
                 }
                 .padding()
@@ -123,7 +131,7 @@ struct FirstSai: View {
 
         let duration = audioPlayer?.duration ?? 0
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + duration + 2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration + 1) {
             currentIndex += 1
             playDialogue()
         }
