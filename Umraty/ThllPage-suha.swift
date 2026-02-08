@@ -21,8 +21,11 @@ struct ThllPage_suha: View {
     @State private var showStars = false
     @State private var dropHair = false
     
-    // مشغل الصوت الخارجي
+    // مشغل الصوت
     @State private var player: AVAudioPlayer?
+    
+    // حالة السهم المتحرك
+    @State private var pulseArrow = false
 
     var body: some View {
         GeometryReader { geo in
@@ -55,10 +58,12 @@ struct ThllPage_suha: View {
                         Image(hairImage)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: geo.size.width * 0.45,
-                                   height: geo.size.height * 0.60)
+                            .frame(
+                                width: geo.size.width * 0.45,
+                                height: geo.size.height * 0.60
+                            )
                         
-                        // المقص مع نص "تقصير"
+                        // ✂️ المقص
                         if showScissors {
                             VStack(spacing: 8) {
                                 Image("مقص شعر")
@@ -70,9 +75,7 @@ struct ThllPage_suha: View {
                                         DragGesture()
                                             .onChanged { value in
                                                 scissorsOffset = value.translation
-                                                if player?.isPlaying == false {
-                                                    playCutSound()
-                                                }
+                                                if player?.isPlaying == false { playCutSound() }
                                             }
                                             .onEnded { _ in
                                                 stopCutSound()
@@ -85,16 +88,16 @@ struct ThllPage_suha: View {
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
-                                    .background(Color(red: 0.5, green: 0.5, blue: 0.0)) // خلفية زيتية
+                                    .background(Color(red: 0.5, green: 0.5, blue: 0.0))
                                     .cornerRadius(12)
                             }
                             .position(
                                 x: scissorsX ?? geo.size.width * 0.85,
-                                y: geo.size.height * 0.25 // رفع المقص للأعلى
+                                y: geo.size.height * 0.25
                             )
                         }
                         
-                        // ماكينة الحلاقة تحت المقص مع نص "حلق"
+                        // 🪒 ماكينة الحلاقة
                         if showRazor {
                             VStack(spacing: 8) {
                                 Image("ماكينه")
@@ -106,9 +109,7 @@ struct ThllPage_suha: View {
                                         DragGesture()
                                             .onChanged { value in
                                                 razorOffset = value.translation
-                                                if player?.isPlaying == false {
-                                                    playShaveSound()
-                                                }
+                                                if player?.isPlaying == false { playShaveSound() }
                                             }
                                             .onEnded { _ in
                                                 stopShaveSound()
@@ -121,16 +122,16 @@ struct ThllPage_suha: View {
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
-                                    .background(Color(red: 0.5, green: 0.5, blue: 0.0)) // خلفية زيتية
+                                    .background(Color(red: 0.5, green: 0.5, blue: 0.0))
                                     .cornerRadius(12)
                             }
                             .position(
                                 x: razorX ?? geo.size.width * 0.85,
-                                y: geo.size.height * 0.60 // تحت المقص مباشرة
+                                y: geo.size.height * 0.60
                             )
                         }
                         
-                        // النجوم بعد الانتهاء
+                        // ⭐ النجوم
                         if showStars {
                             StarsView()
                         }
@@ -139,18 +140,42 @@ struct ThllPage_suha: View {
                     Spacer()
                 }
                 
-                // زر إعادة اللعب
+                // 🔘 أزرار موحدة باللون الزيتي
                 if !showScissors && !showRazor {
-                    Button {
-                        resetGame()
-                    } label: {
-                        Text("🔁 إعادة اللعب")
-                            .font(.system(size: 24, weight: .bold))
-                            .padding(.horizontal, 40)
-                            .padding(.vertical, 18)
-                            .background(Color(red: 0.5, green: 0.5, blue: 0.0))
-                            .foregroundColor(.white)
-                            .cornerRadius(30)
+                    HStack(spacing: 40) {
+                        
+                        // 🔁 إعادة اللعب
+                        Button {
+                            resetGame()
+                        } label: {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.system(size: 32, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(22)
+                                .background(
+                                    Circle().fill(Color(red: 0.5, green: 0.5, blue: 0.0))
+                                )
+                                .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
+                        }
+                        
+                        // ⏭️ التالي
+                        NavigationLink(destination: UmrahPathView(selectedGender: .boy)) {
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 32, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(22)
+                                .background(
+                                    Circle().fill(Color(red: 0.5, green: 0.5, blue: 0.0))
+                                )
+                                .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
+                                .scaleEffect(pulseArrow ? 1.15 : 1)
+                        }
+                        .transition(.scale.combined(with: .opacity))
+                        .onAppear {
+                            withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) {
+                                pulseArrow = true
+                            }
+                        }
                     }
                     .position(
                         x: geo.size.width / 2,
@@ -182,10 +207,12 @@ struct ThllPage_suha: View {
     func performTaqsir(geo: GeometryProxy) {
         playCutSound()
         dropHair = true
+        
         withAnimation(.easeInOut(duration: 0.5)) {
             scissorsX = geo.size.width * 0.75
             scissorsOffset = .zero
         }
+        
         isCutting = true
         
         var count = 0
@@ -194,14 +221,15 @@ struct ThllPage_suha: View {
                 scissorsOffset.width = (count % 2 == 0 ? 30 : -30)
             }
             count += 1
+            
             if count > 5 {
                 timer.invalidate()
-                
                 stopCutSound()
                 
                 withAnimation {
                     scissorsOffset = .zero
                 }
+                
                 isCutting = false
                 dropHair = false
                 finishAction()
@@ -224,20 +252,10 @@ struct ThllPage_suha: View {
     // MARK: - Sounds
     
     func playCutSound() {
-        guard let url = Bundle.main.url(forResource: "cutHair", withExtension: "wav") else {
-            print("❌ ملف الصوت غير موجود")
-            return
-        }
-
-        do {
-            player = try AVAudioPlayer(contentsOf: url)
-            player?.numberOfLoops = -1
-            player?.prepareToPlay()
-            player?.volume = 1.0
-            player?.play()
-        } catch {
-            print("❌ خطأ في تشغيل الصوت")
-        }
+        guard let url = Bundle.main.url(forResource: "cutHair", withExtension: "wav") else { return }
+        player = try? AVAudioPlayer(contentsOf: url)
+        player?.numberOfLoops = -1
+        player?.play()
     }
     
     func stopCutSound() {
@@ -246,20 +264,10 @@ struct ThllPage_suha: View {
     }
     
     func playShaveSound() {
-        guard let url = Bundle.main.url(forResource: "cutHair", withExtension: "wav") else {
-            print("❌ ملف صوت الحلاقة غير موجود")
-            return
-        }
-
-        do {
-            player = try AVAudioPlayer(contentsOf: url)
-            player?.numberOfLoops = -1
-            player?.prepareToPlay()
-            player?.volume = 1.0
-            player?.play()
-        } catch {
-            print("❌ خطأ في تشغيل صوت الحلاقة")
-        }
+        guard let url = Bundle.main.url(forResource: "cutHair", withExtension: "wav") else { return }
+        player = try? AVAudioPlayer(contentsOf: url)
+        player?.numberOfLoops = -1
+        player?.play()
     }
     
     func stopShaveSound() {
@@ -275,7 +283,6 @@ struct ThllPage_suha: View {
             showStars = false
             dropHair = false
             scissorsOffset = .zero
-            isCutting = false
             scissorsX = nil
             razorOffset = .zero
             razorX = nil
@@ -283,18 +290,13 @@ struct ThllPage_suha: View {
     }
 }
 
-#Preview {
-    ThllPage_suha()
-        .previewInterfaceOrientation(.landscapeLeft)
-}
-
-// ⭐ النجوم المتحركة
+// ⭐ النجوم
 struct StarsView: View {
     @State private var animate = false
     
     var body: some View {
         ZStack {
-            ForEach(0..<12) { i in
+            ForEach(0..<12) { _ in
                 Image(systemName: "star.fill")
                     .foregroundColor(.yellow)
                     .font(.system(size: 28))
@@ -304,25 +306,20 @@ struct StarsView: View {
                     )
                     .rotationEffect(.degrees(animate ? 360 : 0))
                     .opacity(animate ? 0 : 1)
-                    .animation(
-                        .easeOut(duration: 1.2).delay(Double(i) * 0.06),
-                        value: animate
-                    )
+                    .animation(.easeOut(duration: 1.2), value: animate)
             }
         }
-        .onAppear {
-            animate = true
-        }
+        .onAppear { animate = true }
     }
 }
 
-// ✂️ الشعر الذي يطيح خلف الطفل
+// ✂️ الشعر المتساقط
 struct FallingHairView: View {
     @State private var fall = false
     
     var body: some View {
         ZStack {
-            ForEach(0..<7) { i in
+            ForEach(0..<7) { _ in
                 Image("شعر قليل")
                     .resizable()
                     .frame(width: 40, height: 40)
@@ -331,14 +328,16 @@ struct FallingHairView: View {
                         y: fall ? 280 : -30
                     )
                     .opacity(fall ? 0 : 1)
-                    .animation(
-                        .easeIn(duration: 0.7).delay(Double(i) * 0.05),
-                        value: fall
-                    )
+                    .animation(.easeIn(duration: 0.7), value: fall)
             }
         }
-        .onAppear {
-            fall = true
-        }
+        .onAppear { fall = true }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        ThllPage_suha()
+            .previewInterfaceOrientation(.landscapeLeft)
     }
 }

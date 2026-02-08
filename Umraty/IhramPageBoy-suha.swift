@@ -4,11 +4,14 @@ struct IhramPageBoy_suha: View {
     
     @State private var zoomAllowed = false
     @State private var zoomForbidden = false
+    @State private var pulseArrow = false
+    @State private var showArrow = false
     
     var body: some View {
         ZStack {
+            
             // الخلفية
-            Color(red: 0.94, green: 0.98, blue: 0.94)
+            Color(red: 0.85, green: 0.93, blue: 0.85)
                 .ignoresSafeArea()
             
             VStack(spacing: 30) {
@@ -16,13 +19,8 @@ struct IhramPageBoy_suha: View {
                 // العنوان
                 Text("الإحرام")
                     .font(.system(size: 70, weight: .bold))
-                    .foregroundColor(Color(red: 0.55, green: 0.72, blue: 0.69))
-                    .shadow(
-                        color: Color.black.opacity(0.15),
-                        radius: 4,
-                        x: 0,
-                        y: 3
-                    )
+                    .foregroundColor(Color(red: 0.5, green: 0.5, blue: 0.0)) // اللون زيتي
+                    .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 3)
                 
                 Divider()
                 
@@ -61,12 +59,12 @@ struct IhramPageBoy_suha: View {
                         .scaledToFit()
                         .frame(height: 480)
                     
-                    // ✅ المسموح (الإحرام)
+                    // ✅ المسموح
                     Image("احرام فقط")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 290)
-                        .scaleEffect(zoomAllowed ? 1.5: 1)
+                        .scaleEffect(zoomAllowed ? 1.5 : 1)
                         .animation(.easeInOut(duration: 0.9), value: zoomAllowed)
                         .overlay(
                             Image(systemName: "checkmark")
@@ -79,17 +77,42 @@ struct IhramPageBoy_suha: View {
                 
                 Spacer()
                 
-                // الأسهم للتنقل
-                HStack(spacing: 80) {
-                    Image(systemName: "chevron.left")
-                    Image(systemName: "chevron.right")
+                // ⏭️ زر السهم (يظهر بعد انتهاء الأنيميشن)
+                if showArrow {
+                    NavigationLink(
+                        destination: UmrahPathView(selectedGender: .boy)
+                    ) {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(22)
+                            .background(
+                                Circle().fill(
+                                    LinearGradient(
+                                        colors: [
+                                            Color(red: 0.5, green: 0.5, blue: 0.0),  // زيتي فاتح
+                                            Color(red: 0.35, green: 0.35, blue: 0.0) // زيتي غامق
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                            )
+                            .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
+                            .scaleEffect(pulseArrow ? 1.15 : 1)
+                    }
+                    .transition(.scale.combined(with: .opacity))
+                    .onAppear {
+                        withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) {
+                            pulseArrow = true
+                        }
+                    }
                 }
-                .font(.system(size: 34))
-                .foregroundColor(.gray)
             }
             .padding(.horizontal, 40)
             .onAppear {
-                // تكبير ثم رجوع المسموح أولاً
+                
+                // 1️⃣ تكبير المسموح
                 withAnimation(.easeInOut(duration: 0.9)) {
                     zoomAllowed = true
                 }
@@ -99,7 +122,7 @@ struct IhramPageBoy_suha: View {
                     }
                 }
                 
-                // بعد المسموح: تكبير ثم رجوع الممنوع
+                // 2️⃣ تكبير الممنوع
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     withAnimation(.easeInOut(duration: 0.8)) {
                         zoomForbidden = true
@@ -110,11 +133,20 @@ struct IhramPageBoy_suha: View {
                         }
                     }
                 }
+                
+                // 3️⃣ إظهار زر السهم بعد انتهاء كل الأنيميشن
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.2) {
+                    withAnimation(.easeInOut) {
+                        showArrow = true
+                    }
+                }
             }
         }
     }
 }
 
 #Preview {
-    IhramPageBoy_suha()
+    NavigationStack {
+        IhramPageBoy_suha()
+    }
 }

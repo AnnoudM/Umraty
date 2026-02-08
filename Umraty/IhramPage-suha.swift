@@ -1,21 +1,16 @@
-//
-//  IhramPage-suha.swift
-//  Umraty
-//
-//  Created by سهى الشهري on 14/08/1447 AH.
-//
-
 import SwiftUI
 
-struct IhramPage_suha: View {
+struct IhramPage_suha_girl: View {
     
     @State private var zoomAllowed = false
     @State private var zoomForbidden = false
+    @State private var showArrow = false
+    @State private var pulseArrow = false
     
     var body: some View {
         ZStack {
             // الخلفية
-            Color(red: 0.94, green: 0.98, blue: 0.94)
+            Color(red: 0.85, green: 0.93, blue: 0.85)
                 .ignoresSafeArea()
             
             VStack(spacing: 30) {
@@ -23,13 +18,8 @@ struct IhramPage_suha: View {
                 // العنوان
                 Text("الإحرام")
                     .font(.system(size: 70, weight: .bold))
-                    .foregroundColor(Color(red: 0.55, green: 0.72, blue: 0.69))
-                    .shadow(
-                        color: Color.black.opacity(0.15),
-                        radius: 4,
-                        x: 0,
-                        y: 3
-                    )
+                    .foregroundColor(Color(red: 0.5, green: 0.5, blue: 0.0)) // اللون زيتي
+                    .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 3)
                 
                 Divider()
                 
@@ -43,7 +33,7 @@ struct IhramPage_suha: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 110)
-                            .scaleEffect(zoomForbidden ? 2: 1)
+                            .scaleEffect(zoomForbidden ? 2 : 1)
                             .animation(.easeInOut(duration: 0.8), value: zoomForbidden)
                         
                         Image("عطر")
@@ -62,18 +52,18 @@ struct IhramPage_suha: View {
                         alignment: .top
                     )
                     
-                    // 👦 الطفل/الشخص
+                    // 👧 البنت بدون الحجاب
                     Image("بنت بدون حجاب")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 380)
                     
-                    // ✅ المسموح
+                    // ✅ المسموح (الحجاب)
                     Image("حجاب البنت")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 360)
-                        .scaleEffect(zoomAllowed ? 1.6: 1) // تكبير أقوى
+                        .scaleEffect(zoomAllowed ? 1.6 : 1)
                         .animation(.easeInOut(duration: 0.9), value: zoomAllowed)
                         .overlay(
                             Image(systemName: "checkmark")
@@ -86,17 +76,42 @@ struct IhramPage_suha: View {
                 
                 Spacer()
                 
-                // الأسهم للتنقل (اختياري)
-                HStack(spacing: 80) {
-                    Image(systemName: "chevron.left")
-                    Image(systemName: "chevron.right")
+                // ⏭️ زر السهم (يظهر بعد انتهاء الأنيميشن)
+                if showArrow {
+                    NavigationLink(
+                        destination: UmrahPathView(selectedGender: .girl)
+                    ) {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(22)
+                            .background(
+                                Circle().fill(
+                                    LinearGradient(
+                                        colors: [
+                                            Color(red: 0.5, green: 0.5, blue: 0.0),  // زيتي فاتح
+                                            Color(red: 0.35, green: 0.35, blue: 0.0) // زيتي غامق
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                            )
+                            .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
+                            .scaleEffect(pulseArrow ? 1.15 : 1)
+                    }
+                    .transition(.scale.combined(with: .opacity))
+                    .onAppear {
+                        withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) {
+                            pulseArrow = true
+                        }
+                    }
                 }
-                .font(.system(size: 34))
-                .foregroundColor(.gray)
             }
             .padding(.horizontal, 40)
             .onAppear {
-                // أولاً: تكبير ثم رجوع المسموح
+                
+                // 1️⃣ تكبير المسموح
                 withAnimation(.easeInOut(duration: 0.9)) {
                     zoomAllowed = true
                 }
@@ -106,8 +121,8 @@ struct IhramPage_suha: View {
                     }
                 }
                 
-                // بعد انتهاء المسموح: تكبير ثم رجوع الممنوع
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { // 0.9 + 0.6
+                // 2️⃣ تكبير الممنوع
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     withAnimation(.easeInOut(duration: 0.8)) {
                         zoomForbidden = true
                     }
@@ -117,11 +132,20 @@ struct IhramPage_suha: View {
                         }
                     }
                 }
+                
+                // 3️⃣ إظهار زر السهم بعد انتهاء كل الأنيميشن
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.2) {
+                    withAnimation(.easeInOut) {
+                        showArrow = true
+                    }
+                }
             }
         }
     }
 }
 
 #Preview {
-    IhramPage_suha()
+    NavigationStack {
+        IhramPage_suha_girl()
+    }
 }

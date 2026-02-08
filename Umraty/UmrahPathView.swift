@@ -321,7 +321,7 @@ struct UmrahStepRouterView: View {
     var body: some View {
         if step == 1 {
             if selectedGender == .girl {
-                IhramPage_suha()
+                IhramPage_suha_girl()
             } else {
                 IhramPageBoy_suha()
             }
