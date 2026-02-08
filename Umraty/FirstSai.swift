@@ -112,7 +112,7 @@ struct FirstSai: View {
         case 0: audioName = "mohammed_0"
         case 1: audioName = "noura_1"
         case 2: audioName = "mohammed_2"
-        case 3: audioName = "noura_3"
+        case 3: audioName = "noura"
         case 4: audioName = "mohammed_4"
         case 5: audioName = "noura_5"
         case 6: audioName = "mohammed_6"
