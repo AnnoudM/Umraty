@@ -1,9 +1,4 @@
-//
-//  Duaa.swift
-//  Umraty
-//
-//  Created by Noura Alghamdi on 16/08/1447 AH.
-//
+
 
 import SwiftUI
 

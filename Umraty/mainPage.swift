@@ -1,9 +1,5 @@
-//
-//  mainPage.swift
-//  Umraty
-//
-//  Created by Ghaliah alsharif on 16/08/1447 AH.
-//
+
+
 
 import SwiftUI
 

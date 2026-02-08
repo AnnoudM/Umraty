@@ -1,3 +1,8 @@
+
+
+
+
+
 import SwiftUI
 
 struct CharacterSelectionView: View {
@@ -29,12 +34,20 @@ struct CharacterSelectionView: View {
                                         savedGender = ChildGender.boy.rawValue
                                     }
                             } label: {
-                                Image("boy")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: geo.size.width * 0.35,
-                                           height: geo.size.height * 0.45)
-                                    .shadow(radius: 4)
+                                VStack(spacing: 8) {
+                                    Image("boy")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(
+                                            width: geo.size.width * 0.35,
+                                            height: geo.size.height * 0.45
+                                        )
+                                        .shadow(radius: 4)
+
+                                    Text("محمد")
+                                        .font(.system(size: geo.size.width * 0.045, weight: .medium))
+                                        .foregroundColor(.black)
+                                }
                             }
 
                             NavigationLink {
@@ -43,12 +56,20 @@ struct CharacterSelectionView: View {
                                         savedGender = ChildGender.girl.rawValue
                                     }
                             } label: {
-                                Image("girl")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: geo.size.width * 0.35,
-                                           height: geo.size.height * 0.45)
-                                    .shadow(radius: 4)
+                                VStack(spacing: 8) {
+                                    Image("girl")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(
+                                            width: geo.size.width * 0.35,
+                                            height: geo.size.height * 0.45
+                                        )
+                                        .shadow(radius: 4)
+
+                                    Text("نورة")
+                                        .font(.system(size: geo.size.width * 0.045, weight: .medium))
+                                        .foregroundColor(.black)
+                                }
                             }
                         }
 
