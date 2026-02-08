@@ -30,24 +30,17 @@ struct mainPage: View {
 
             // ☁️ الغيوم
             ZStack {
-
                 Image("cloud 1")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 280)
-                    .offset(
-                        x: cloud1Move ? 450 : -450,
-                        y: -300
-                    )
+                    .offset(x: cloud1Move ? 450 : -450, y: -300)
 
                 Image("cloud 2")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 260)
-                    .offset(
-                        x: cloud2Move ? -450 : 450,
-                        y: -200
-                    )
+                    .offset(x: cloud2Move ? -450 : 450, y: -200)
 
                 Image("cloud 3")
                     .resizable()
@@ -69,6 +62,7 @@ struct mainPage: View {
 
                 Spacer()
 
+                // 👣 الشخصيات أقدامهم ثابتة
                 ZStack(alignment: .bottom) {
 
                     Image("kabaa")
@@ -80,9 +74,9 @@ struct mainPage: View {
                     Image("characters")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 300)
+                        .frame(width: 800)
                         .scaleEffect(kidsScale)
-                        .offset(y: kidsBobbing ? -70 : 20)
+                        .offset(y: kidsBobbing ? -40 : 0) // ✅ FIX
                 }
             }
         }
@@ -98,7 +92,7 @@ struct mainPage: View {
     // MARK: - Animations
     func startAnimations() {
 
-        // 👦 الأطفال
+        // 👦 حركة لطيفة بدون كسر الأرض
         withAnimation(
             .easeInOut(duration: 1.5)
                 .repeatForever(autoreverses: true)
@@ -106,23 +100,15 @@ struct mainPage: View {
             kidsBobbing = true
         }
 
-        // ☁️ الغيوم (يمين ← يسار)
-        withAnimation(
-            .linear(duration: 18)
-                .repeatForever(autoreverses: false)
-        ) {
+        // ☁️ الغيوم
+        withAnimation(.linear(duration: 18).repeatForever()) {
             cloud1Move = true
         }
 
-        // ☁️ الغيوم (يسار ← يمين)
-        withAnimation(
-            .linear(duration: 22)
-                .repeatForever(autoreverses: false)
-        ) {
+        withAnimation(.linear(duration: 22).repeatForever()) {
             cloud2Move = true
         }
 
-        // ☁️ غيمة دائرية
         Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { timer in
             if stopAnimations {
                 timer.invalidate()
@@ -132,22 +118,17 @@ struct mainPage: View {
         }
     }
 
-    // MARK: - Auto Transition (⏱️ 3 seconds splash)
+    // MARK: - Auto Transition
     func startAutoTransition() {
-
-        // ⏱️ مدة عرض شاشة السبلاش = 3 ثواني
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
 
-            // 🛑 إيقاف الأنيميشن
             stopAnimations = true
             kidsBobbing = false
 
-            // ☁️ اختفاء الغيوم أولًا
             withAnimation(.easeOut(duration: 1.5)) {
                 cloudsOpacity = 0
             }
 
-            // 🎬 Fade + Zoom لباقي العناصر
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 withAnimation(.easeInOut(duration: 2)) {
                     kidsScale = 1.6
@@ -155,7 +136,6 @@ struct mainPage: View {
                 }
             }
 
-            // ⏭ الانتقال للصفحة التالية
             DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
                 moveToNextScreen = true
             }

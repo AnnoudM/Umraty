@@ -3,7 +3,12 @@ import SwiftUI
 struct SecondPage: View {
 
     let selectedGender: ChildGender
+
+    // ✅ لازم موجود عشان NavigationStack(path:)
     @State private var umrahNavPath: [StepID] = []
+
+    // ✅ زر الرجوع
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack(path: $umrahNavPath) {
@@ -72,11 +77,28 @@ struct SecondPage: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+
+            // إذا StepID مستخدم عندك للتنقل الداخلي
             .navigationDestination(for: StepID.self) { stepID in
                 UmrahStepRouterView(
                     selectedGender: selectedGender,
                     step: stepID.value
                 )
+            }
+
+            // ✅ زر الرجوع أعلى اليسار
+            .overlay(alignment: .topLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(.black.opacity(0.65))
+                        .padding(10)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 18)
+                .padding(.leading, 18)
             }
         }
     }
@@ -128,10 +150,10 @@ struct SecondMenuCircleButton: View {
     }
 }
 
+// MARK: - صفحة مؤقتة للألعاب
 struct GamesPage: View {
     var body: some View {
         Text("صفحة الألعاب")
             .font(.largeTitle)
     }
 }
-
