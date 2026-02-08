@@ -4,63 +4,42 @@ struct SecondPage: View {
 
     let selectedGender: ChildGender
 
-    // ✅ لازم موجود عشان NavigationStack(path:)
-    @State private var umrahNavPath: [StepID] = []
-
-    // ✅ زر الرجوع
-    @Environment(\.dismiss) private var dismiss
-
     var body: some View {
-        NavigationStack(path: $umrahNavPath) {
-            GeometryReader { geo in
-                let w = geo.size.width
-                let h = geo.size.height
+        GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
 
-                let circleSize = min(w, h) * 0.23
-                let pillWidth  = circleSize * 1.7
-                let pillHeight = circleSize * 1.05
+            let circleSize = min(w, h) * 0.23
+            let pillWidth  = circleSize * 1.7
+            let pillHeight = circleSize * 1.05
 
-                ZStack {
-                    Color(red: 0.94, green: 0.98, blue: 0.95)
-                        .ignoresSafeArea()
+            ZStack {
+                Color(red: 0.94, green: 0.98, blue: 0.95)
+                    .ignoresSafeArea()
 
-                    VStack(spacing: h * 0.08) {
+                VStack(spacing: h * 0.08) {
 
-                        HStack(spacing: w * 0.10) {
+                    HStack(spacing: w * 0.10) {
 
-                            NavigationLink(destination: GamesPage()) {
-                                SecondMenuCircleButton(
-                                    imageName: "image1 1",
-                                    title: "العاب",
-                                    circleSize: circleSize,
-                                    pillWidth: pillWidth,
-                                    pillHeight: pillHeight,
-                                    imageScale: 1.20,
-                                    imageX: 3,
-                                    imageY: 0
-                                )
-                            }
-
-                            NavigationLink(
-                                destination: UmrahPathView(selectedGender: selectedGender)
-                            ) {
-                                SecondMenuCircleButton(
-                                    imageName: "image2",
-                                    title: "تعلم العمرة",
-                                    circleSize: circleSize,
-                                    pillWidth: pillWidth,
-                                    pillHeight: pillHeight,
-                                    imageScale: 1.90,
-                                    imageX: 3,
-                                    imageY: 0
-                                )
-                            }
+                        NavigationLink(destination: GamesPage()) {
+                            SecondMenuCircleButton(
+                                imageName: "image1 1",
+                                title: "العاب",
+                                circleSize: circleSize,
+                                pillWidth: pillWidth,
+                                pillHeight: pillHeight,
+                                imageScale: 1.20,
+                                imageX: 3,
+                                imageY: 0
+                            )
                         }
 
-                        NavigationLink(destination: Duaa()) {
+                        NavigationLink(
+                            destination: UmrahPathView(selectedGender: selectedGender)
+                        ) {
                             SecondMenuCircleButton(
-                                imageName: "image3",
-                                title: "أدعية",
+                                imageName: "image2",
+                                title: "تعلم العمرة",
                                 circleSize: circleSize,
                                 pillWidth: pillWidth,
                                 pillHeight: pillHeight,
@@ -69,40 +48,31 @@ struct SecondPage: View {
                                 imageY: 0
                             )
                         }
-
-                        Spacer()
                     }
-                    .padding(.top, h * 0.12)
-                    .padding(.horizontal, w * 0.08)
-                }
-            }
-            .toolbar(.hidden, for: .navigationBar)
 
-            // إذا StepID مستخدم عندك للتنقل الداخلي
-            .navigationDestination(for: StepID.self) { stepID in
-                UmrahStepRouterView(
-                    selectedGender: selectedGender,
-                    step: stepID.value
-                )
-            }
+                    NavigationLink(destination: Duaa()) {
+                        SecondMenuCircleButton(
+                            imageName: "image3",
+                            title: "أدعية",
+                            circleSize: circleSize,
+                            pillWidth: pillWidth,
+                            pillHeight: pillHeight,
+                            imageScale: 1.90,
+                            imageX: 3,
+                            imageY: 0
+                        )
+                    }
 
-            // ✅ زر الرجوع أعلى اليسار
-            .overlay(alignment: .topLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(.black.opacity(0.65))
-                        .padding(10)
+                    Spacer()
                 }
-                .buttonStyle(.plain)
-                .padding(.top, 18)
-                .padding(.leading, 18)
+                .padding(.top, h * 0.12)
+                .padding(.horizontal, w * 0.08)
             }
         }
+        .toolbar(.hidden, for: .navigationBar) // ✅ تخفينه هنا عادي
     }
 }
+
 
 // MARK: - زر الدائرة
 struct SecondMenuCircleButton: View {

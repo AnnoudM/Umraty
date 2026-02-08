@@ -1,12 +1,10 @@
-
-
-
 import SwiftUI
 import AVFoundation
 
 struct Tawaf: View {
 
     let selectedGender: ChildGender
+    let onComplete: () -> Void   // ✅ جديد
 
     private let centerXOffset: CGFloat = 0.60
     private let centerYOffset: CGFloat = 280
@@ -28,6 +26,9 @@ struct Tawaf: View {
     @State private var audioStarted: Bool = false
 
     @State private var tawafStarted: Bool = false
+
+    // ✅ عشان نضمن ما ينادي onComplete مرتين
+    @State private var didComplete: Bool = false
 
     private var walkFrame: String {
         switch selectedGender {
@@ -112,7 +113,6 @@ struct Tawaf: View {
         }
     }
 
-   
     private func walkingCharacter(
         flipped: Bool,
         opacity: Double
@@ -163,6 +163,7 @@ struct Tawaf: View {
     }
 
     private func startTawaf() {
+        didComplete = false
         tawafStarted = true
         completedRounds = 0
         progress = 0.5
@@ -176,6 +177,12 @@ struct Tawaf: View {
             showFront = true
             showBack = false
             stopTawafAudio()
+
+            // ✅ نحدث التقدم مرة وحدة
+            if !didComplete {
+                didComplete = true
+                onComplete()
+            }
             return
         }
 
@@ -204,5 +211,5 @@ struct Tawaf: View {
 }
 
 #Preview {
-    Tawaf(selectedGender: .girl)
+    Tawaf(selectedGender: .girl) { }
 }

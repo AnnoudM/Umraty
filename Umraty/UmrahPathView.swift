@@ -4,7 +4,7 @@ struct UmrahPathView: View {
 
     let selectedGender: ChildGender
 
-    @State private var navPath: [StepID] = []
+    @State private var selectedStep: StepID? = nil
 
     @AppStorage("umrah_progress_boy") private var progressBoy: Int = 1
     @AppStorage("umrah_progress_girl") private var progressGirl: Int = 1
@@ -12,105 +12,91 @@ struct UmrahPathView: View {
     @State private var showLockedAlert = false
     @State private var lockedStepTapped: Int = 0
 
-    @Environment(\.dismiss) private var dismiss
-
     private func getCurrentStep() -> Int {
         selectedGender == .boy ? progressBoy : progressGirl
     }
 
     var body: some View {
-        NavigationStack(path: $navPath) {
-            GeometryReader { geo in
-                let w = geo.size.width
-                let h = geo.size.height
-                let circleSize = min(w, h) * 0.13
-                let iconSize = circleSize * 0.42
-                let numberSize = circleSize * 0.35
-                let characterSize = circleSize * 0.90
-                let centerY = h * 0.50
-                let currentStep = getCurrentStep()
+        GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
+            let circleSize = min(w, h) * 0.13
+            let iconSize = circleSize * 0.42
+            let numberSize = circleSize * 0.35
+            let characterSize = circleSize * 0.90
+            let centerY = h * 0.50
+            let currentStep = getCurrentStep()
 
-                ZStack {
-                    Color(red: 0.85, green: 0.93, blue: 0.85).ignoresSafeArea()
+            ZStack {
+                Color(red: 0.85, green: 0.93, blue: 0.85).ignoresSafeArea()
 
-                    VStack(spacing: 0) {
-                        HStack {
-                            Button { dismiss() } label: {
-                                Image(systemName: "chevron.left")
-                                    .font(.system(size: min(w, h) * 0.055, weight: .bold))
-                                    .foregroundColor(.black)
-                            }
-                            Spacer()
-                        }
-                        .padding(.horizontal, w * 0.05)
-                        .padding(.top, h * 0.04)
+                VStack(spacing: 0) {
 
-                        Text("خطوات العمرة")
-                            .font(.system(size: min(w, h) * 0.085, weight: .bold))
-                            .foregroundColor(Color(red: 0.58, green: 0.72, blue: 0.72))
-                            .shadow(color: Color.black.opacity(0.15), radius: 3, x: 0, y: 3)
-                            .padding(.top, h * 0.02)
+                    Text("خطوات العمرة")
+                        .font(.system(size: min(w, h) * 0.085, weight: .bold))
+                        .foregroundColor(Color("Color1"))
+                        .shadow(color: Color.black.opacity(0.15), radius: 3, x: 0, y: 3)
+                        .padding(.top, h * 0.07)
 
-                        Spacer()
+                    Spacer()
 
-                        ZStack {
-                            UmrahCurvedPath()
-                                .stroke(Color.gray.opacity(0.35),
-                                        style: StrokeStyle(
-                                            lineWidth: max(2, circleSize * 0.06),
-                                            lineCap: .round,
-                                            dash: [10, 10]
-                                        ))
-                                .frame(width: w * 0.78, height: h * 0.22)
-                                .position(x: w * 0.54, y: centerY)
+                    ZStack {
+                        UmrahCurvedPath()
+                            .stroke(Color.gray.opacity(0.35),
+                                    style: StrokeStyle(
+                                        lineWidth: max(2, circleSize * 0.06),
+                                        lineCap: .round,
+                                        dash: [10, 10]
+                                    ))
+                            .frame(width: w * 0.78, height: h * 0.22)
+                            .position(x: w * 0.54, y: centerY)
 
-                            ForEach(1...5, id: \.self) { step in
-                                StepNode(
-                                    step: step,
-                                    currentStep: currentStep,
-                                    circleSize: circleSize,
-                                    iconSize: iconSize,
-                                    numberSize: numberSize,
-                                    position: nodePosition(step: step, w: w, centerY: centerY),
-                                    iconAssetName: iconAssetName(step: step),
-                                    onTap: { tapped in
-                                        if tapped <= currentStep {
-                                            navPath.append(StepID(value: tapped))
-                                        } else {
-                                            lockedStepTapped = tapped
-                                            showLockedAlert = true
-                                        }
+                        ForEach(1...5, id: \.self) { step in
+                            StepNode(
+                                step: step,
+                                currentStep: currentStep,
+                                circleSize: circleSize,
+                                iconSize: iconSize,
+                                numberSize: numberSize,
+                                position: nodePosition(step: step, w: w, centerY: centerY),
+                                iconAssetName: iconAssetName(step: step),
+                                onTap: { tapped in
+                                    if tapped <= currentStep {
+                                        selectedStep = StepID(value: tapped)   // ✅ بدل navPath.append
+                                    } else {
+                                        lockedStepTapped = tapped
+                                        showLockedAlert = true
                                     }
-                                )
-                            }
-
-                            Image(selectedGender == .boy ? "boy" : "girl")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: characterSize)
-                                .position(characterPosition(
-                                    base: nodePosition(step: currentStep, w: w, centerY: centerY),
-                                    yOffset: circleSize * 1.35
-                                ))
+                                }
+                            )
                         }
 
-                        Spacer()
+                        Image(selectedGender == .boy ? "boy" : "girl")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: characterSize)
+                            .position(characterPosition(
+                                base: nodePosition(step: currentStep, w: w, centerY: centerY),
+                                yOffset: circleSize * 1.35
+                            ))
                     }
+
+                    Spacer()
                 }
             }
-            .alert("هذه الخطوة مغلقة", isPresented: $showLockedAlert) {
-                Button("تمام", role: .cancel) { }
-            } message: {
-                Text("أكمل الخطوة السابقة أولاً  \(lockedStepTapped).")
-            }
-            .navigationBarBackButtonHidden(true)
-            .navigationDestination(for: StepID.self) { stepID in
-                UmrahStepRouterView(
-                    selectedGender: selectedGender,
-                    step: stepID.value
-                )
-            }
         }
+        .alert("هذه الخطوة مغلقة", isPresented: $showLockedAlert) {
+            Button("تمام", role: .cancel) { }
+        } message: {
+            Text("أكمل الخطوة السابقة أولاً  \(lockedStepTapped).")
+        }
+        .navigationDestination(item: $selectedStep) { stepID in
+            UmrahStepRouterView(
+                selectedGender: selectedGender,
+                step: stepID.value
+            )
+        }
+    }
     }
 
     private func nodePosition(step: Int, w: CGFloat, centerY: CGFloat) -> CGPoint {
@@ -137,7 +123,6 @@ struct UmrahPathView: View {
         default: return "quizz"
         }
     }
-}
 
 
 // MARK: - StepNode
@@ -277,7 +262,6 @@ struct StepDetailView: View {
             }
             .padding(.top, 40)
         }
-        .navigationBarHidden(true)
     }
 
     private func stepTitle(_ step: Int) -> String {
@@ -325,20 +309,27 @@ struct UmrahStepRouterView: View {
             } else {
                 IhramPageBoy_suha()
             }
+
+        } else if step == 2 {
+                    Tawaf(selectedGender: selectedGender) {
+                completeStep(2)
+            }
+
         } else if step == 3 {
             FirstSai()
+
         } else if step == 4 {
             if selectedGender == .girl {
                 ThllPagegirl_suha()
             } else {
                 ThllPage_suha()
             }
+
         } else {
             StepDetailView(step: step) { completeStep(step) }
         }
     }
 }
-
 
 // MARK: - Preview
 #Preview {

@@ -21,7 +21,7 @@ struct CharacterSelectionView: View {
 
                         Text("اختر شخصيتك")
                             .font(.system(size: geo.size.width * 0.07, weight: .bold))
-                            .foregroundColor(.black)
+                            .foregroundColor(Color("Color1"))
                             .minimumScaleFactor(0.7)
 
                         Spacer(minLength: geo.size.height * 0.08)
@@ -46,7 +46,7 @@ struct CharacterSelectionView: View {
 
                                     Text("محمد")
                                         .font(.system(size: geo.size.width * 0.045, weight: .medium))
-                                        .foregroundColor(.black)
+                                        .foregroundColor(Color("Color1"))
                                 }
                             }
 
@@ -68,7 +68,7 @@ struct CharacterSelectionView: View {
 
                                     Text("نورة")
                                         .font(.system(size: geo.size.width * 0.045, weight: .medium))
-                                        .foregroundColor(.black)
+                                        .foregroundColor(Color("Color1"))
                                 }
                             }
                         }
