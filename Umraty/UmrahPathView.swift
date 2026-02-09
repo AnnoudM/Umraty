@@ -32,7 +32,7 @@ struct UmrahPathView: View {
 
                 VStack(spacing: 0) {
 
-                    Text("خطوات العمرة")
+                    Text("umrah_steps_title")
                         .font(.system(size: min(w, h) * 0.085, weight: .bold))
                         .foregroundColor(Color("Color1"))
                         .shadow(color: Color.black.opacity(0.15), radius: 3, x: 0, y: 3)
@@ -85,10 +85,11 @@ struct UmrahPathView: View {
                 }
             }
         }
-        .alert("هذه الخطوة مغلقة", isPresented: $showLockedAlert) {
-            Button("تمام", role: .cancel) { }
+        .alert(Text("step_locked_title"), isPresented: $showLockedAlert) {
+            Button("step_locked_ok", role: .cancel) { }
         } message: {
-            Text("أكمل الخطوة السابقة أولاً  \(lockedStepTapped).")
+            Text(String(format: NSLocalizedString("step_locked_message", comment: ""),
+                        "\(lockedStepTapped)"))
         }
         .navigationDestination(item: $selectedStep) { stepID in
             UmrahStepRouterView(
@@ -227,11 +228,11 @@ struct StepDetailView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 18) {
-                Text(stepTitle(step))
+                Text(stepTitleKey(step))
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.black)
 
-                Text(" محتوى الخطوة (شرح + صور/أنشطة).")
+                Text("step_content_placeholder")
                     .font(.system(size: 18, weight: .medium))
                     .foregroundColor(.black.opacity(0.7))
                     .multilineTextAlignment(.center)
@@ -241,7 +242,7 @@ struct StepDetailView: View {
                     onComplete()
                     dismiss()
                 } label: {
-                    Text("إنهاء الخطوة")
+                    Text("step_finish")
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.white)
                         .padding(.vertical, 14)
@@ -254,7 +255,7 @@ struct StepDetailView: View {
                 Button {
                     dismiss()
                 } label: {
-                    Text("رجوع")
+                    Text("back")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.black.opacity(0.7))
                 }
@@ -264,13 +265,13 @@ struct StepDetailView: View {
         }
     }
 
-    private func stepTitle(_ step: Int) -> String {
+    private func stepTitleKey(_ step: Int) -> LocalizedStringKey {
         switch step {
-        case 1: return "الإحرام"
-        case 2: return "الطواف"
-        case 3: return "السعي"
-        case 4: return "التحلل"
-        default: return "الاختبار"
+        case 1: return "step_title_ihram"
+        case 2: return "step_title_tawaf"
+        case 3: return "step_title_sai"
+        case 4: return "step_title_tahallul"
+        default: return "step_title_quiz"
         }
     }
 }

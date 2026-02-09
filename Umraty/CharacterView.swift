@@ -19,7 +19,7 @@ struct CharacterSelectionView: View {
                     VStack {
                         Spacer(minLength: geo.size.height * 0.08)
 
-                        Text("اختر شخصيتك")
+                        Text("choose_friend_title")
                             .font(.system(size: geo.size.width * 0.07, weight: .bold))
                             .foregroundColor(Color("Color1"))
                             .minimumScaleFactor(0.7)
@@ -44,7 +44,7 @@ struct CharacterSelectionView: View {
                                         )
                                         .shadow(radius: 4)
 
-                                    Text("محمد")
+                                    Text("character_mohammed")
                                         .font(.system(size: geo.size.width * 0.045, weight: .medium))
                                         .foregroundColor(Color("Color1"))
                                 }
@@ -66,7 +66,7 @@ struct CharacterSelectionView: View {
                                         )
                                         .shadow(radius: 4)
 
-                                    Text("نورة")
+                                    Text("character_noura")
                                         .font(.system(size: geo.size.width * 0.045, weight: .medium))
                                         .foregroundColor(Color("Color1"))
                                 }
