@@ -3,6 +3,10 @@ import AVFoundation
 
 struct ThllPagegirl_suha: View {
     
+    // MARK: - RTL Support
+    @Environment(\.layoutDirection) private var layoutDirection
+    var rtlMultiplier: CGFloat { layoutDirection == .rightToLeft ? -1 : 1 }
+    
     // MARK: - States
     @State private var hairImage = "بنت بشعر"
     
@@ -19,9 +23,7 @@ struct ThllPagegirl_suha: View {
     // مشغل الصوت
     @State private var player: AVAudioPlayer?
     
-    // حالة الأزرار التفاعلية
-    @State private var isReplayPressed = false
-    @State private var isNextPressed = false
+    // حالة السهم المتحرك
     @State private var pulseArrow = false
 
     var body: some View {
@@ -35,12 +37,12 @@ struct ThllPagegirl_suha: View {
                 VStack(spacing: 16) {
                     
                     // العنوان
-                    Text("التحلل من العمرة")
-                        .font(.system(size: 42, weight: .bold))
-                        .foregroundColor(Color(red: 0.5, green: 0.5, blue: 0.0))
+                    Text("thllPage_title")
+                        .font(.system(size: 70, weight: .bold))
+                        .foregroundColor(Color.color1)
                     
-                    Text("اسحبي المقص لتقصير الشعر✂️")
-                        .font(.system(size: 26))
+                    Text("thllPagegirl_instruction")
+                        .font(.system(size: 50))
                         .foregroundColor(.black.opacity(0.7))
                     
                     Spacer()
@@ -71,7 +73,10 @@ struct ThllPagegirl_suha: View {
                                     .gesture(
                                         DragGesture()
                                             .onChanged { value in
-                                                scissorsOffset = value.translation
+                                                scissorsOffset = CGSize(
+                                                    width: value.translation.width * rtlMultiplier,
+                                                    height: value.translation.height - 30
+                                                )
                                                 if player?.isPlaying == false { playCutSound() }
                                             }
                                             .onEnded { _ in
@@ -80,17 +85,17 @@ struct ThllPagegirl_suha: View {
                                             }
                                     )
                                 
-                                Text("تقصير")
-                                    .font(.system(size: 36, weight: .bold))
+                                Text("button_cut")
+                                    .font(.system(size: 40, weight: .bold))
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
-                                    .background(Color(red: 0.5, green: 0.5, blue: 0.0))
+                                    .background(Color.color1)
                                     .cornerRadius(12)
                             }
                             .position(
-                                x: scissorsX ?? geo.size.width * 0.85,
-                                y: geo.size.height * 0.4
+                                x: scissorsX ?? geo.size.width * 0.15,
+                                y: geo.size.height * 0.25
                             )
                         }
                         
@@ -103,11 +108,9 @@ struct ThllPagegirl_suha: View {
                     Spacer()
                 }
                 
-                // 🔘 أزرار موحدة باللون الزيتي مع نبض للزر التالي
+                // 🔘 الأزرار بعد الانتهاء
                 if !showScissors {
                     HStack(spacing: 40) {
-                        
-                        // 🔁 إعادة اللعب
                         Button {
                             resetGame()
                         } label: {
@@ -115,25 +118,19 @@ struct ThllPagegirl_suha: View {
                                 .font(.system(size: 32, weight: .bold))
                                 .foregroundColor(.white)
                                 .padding(22)
-                                .background(
-                                    Circle().fill(Color(red: 0.5, green: 0.5, blue: 0.0))
-                                )
+                                .background(Circle().fill(Color.color1))
                                 .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
                         }
                         
-                        // ⏭️ التالي مع نبض
                         NavigationLink(destination: UmrahPathView(selectedGender: .girl)) {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 32, weight: .bold))
                                 .foregroundColor(.white)
                                 .padding(22)
-                                .background(
-                                    Circle().fill(Color(red: 0.5, green: 0.5, blue: 0.0))
-                                )
+                                .background(Circle().fill(Color.color1))
                                 .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
                                 .scaleEffect(pulseArrow ? 1.15 : 1)
                         }
-                        .transition(.scale.combined(with: .opacity))
                         .onAppear {
                             withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) {
                                 pulseArrow = true
@@ -156,17 +153,20 @@ struct ThllPagegirl_suha: View {
         playCutSound()
         dropHair = true
         
+        let centerX = geo.size.width * 0.5
         withAnimation(.easeInOut(duration: 0.5)) {
-            scissorsX = geo.size.width * 0.75
+            scissorsX = centerX
             scissorsOffset = .zero
         }
         
         isCutting = true
-        
         var count = 0
+        
         Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { timer in
             withAnimation(.easeInOut(duration: 0.18)) {
-                scissorsOffset.width = (count % 2 == 0 ? 30 : -30)
+                let offsetAmount: CGFloat = 30
+                scissorsOffset.width = (count % 2 == 0 ? offsetAmount : -offsetAmount)
+                scissorsOffset.height = 0
             }
             count += 1
             
@@ -219,30 +219,6 @@ struct ThllPagegirl_suha: View {
             dropHair = false
             scissorsOffset = .zero
             scissorsX = nil
-        }
-    }
-}
-
-// ✅ زر دائري موحد
-struct CircleButton: View {
-    let iconName: String
-    @Binding var isPressed: Bool
-    var action: (() -> Void)? = nil
-    
-    var body: some View {
-        Button(action: { action?() }) {
-            Image(systemName: iconName)
-                .font(.system(size: 32, weight: .bold))
-                .foregroundColor(.white)
-                .frame(width: 70, height: 70)
-                .background(Color(red: 0.5, green: 0.5, blue: 0.0))
-                .clipShape(Circle())
-                .scaleEffect(isPressed ? 1.2 : 1)
-                .shadow(color: .yellow.opacity(isPressed ? 0.6 : 0), radius: 8, x: 0, y: 0)
-                .animation(.spring(response: 0.3, dampingFraction: 0.5), value: isPressed)
-                .onLongPressGesture(minimumDuration: 0.01, pressing: { pressing in
-                    isPressed = pressing
-                }, perform: {})
         }
     }
 }
