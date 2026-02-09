@@ -89,8 +89,8 @@ struct IhramPage_suha_girl: View {
                                 Circle().fill(
                                     LinearGradient(
                                         colors: [
-                                            Color(red: 0.5, green: 0.5, blue: 0.0),  // زيتي فاتح
-                                            Color(red: 0.35, green: 0.35, blue: 0.0) // زيتي غامق
+                                            Color.color1,  // زيتي فاتح
+                                            Color.color1 // زيتي غامق
                                         ],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
