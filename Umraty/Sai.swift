@@ -7,214 +7,232 @@
 
 
 
-internal import Combine
+import Combine
 import SwiftUI
 import AVFoundation
 
 struct Sai: View {
-    
+
     // الرجل
     @State private var manProgress: CGFloat = 0
     @State private var manRounds = 0
     @State private var manGoingForward = true
     @State private var manAuto = false
     @State private var manFinished = false
-    @State private var manSpoken = false   // لمنع تكرار الصوت
-    
+    @State private var manSpoken = false
+
     // المرأة
     @State private var womanProgress: CGFloat = 0
     @State private var womanRounds = 0
     @State private var womanGoingForward = true
     @State private var womanAuto = false
     @State private var womanFinished = false
-    @State private var womanSpoken = false // لمنع تكرار الصوت
-    
-    // الصوت
+    @State private var womanSpoken = false
+
     let speaker = AVSpeechSynthesizer()
-    
-    // اللون الزيتي الفاتح
-    let lightOlive = Color(red: 0.6, green: 0.65, blue: 0.4)
-    
+
     var body: some View {
         GeometryReader { geo in
+
+            let isLandscape = geo.size.width > geo.size.height
+            let textColor = Color("Color1")
+
+            let startBtnW = min(geo.size.width * 0.28, 220)
+
+            let trackPadding = geo.size.width * 0.10
+            let trackStartX = trackPadding
+            let trackEndX = geo.size.width - trackPadding
+            let trackWidth = trackEndX - trackStartX
+
+            let greenWidth = trackWidth * 0.20
+            let greenStartProgress = ((trackWidth * 0.5) - (greenWidth / 2)) / trackWidth
+            let greenEndProgress   = ((trackWidth * 0.5) + (greenWidth / 2)) / trackWidth
+
+            // ارتفاع لوحة المسار
+            let trackHeight = geo.size.height * (isLandscape ? 0.34 : 0.38)
+
             ZStack {
-                Color(red: 0.93, green: 0.99, blue: 0.93)
+
+                // الخلفية
+                Image("background2")
+                    .resizable()
+                    .scaledToFill()
                     .ignoresSafeArea()
-                
-                VStack(spacing: 20) {
+
+                VStack(spacing: isLandscape ? 12 : 16) {
+
+                    // العنوان
                     Text("السعي بين الصفا والمروة")
-                        .font(.system(size: geo.size.width * 0.06, weight: .bold))
-                        .foregroundColor(lightOlive)
-                    
-                    HStack(spacing: geo.size.width * 0.1) {
-                        VStack {
+                        .font(.system(size: geo.size.width * 0.05, weight: .bold))
+                        .padding(.top, 6)
+
+                    // العدادات
+                    HStack(spacing: geo.size.width * 0.10) {
+                        VStack(spacing: 2) {
                             Text("الرجل")
-                                .font(.system(size: geo.size.width * 0.045, weight: .bold))
-                                .foregroundColor(lightOlive)
+                                .font(.system(size: geo.size.width * 0.035, weight: .bold))
                             Text(manFinished ? "تم السعي" : "الأشواط: \(manRounds)")
-                                .foregroundColor(lightOlive)
+                                .font(.system(size: geo.size.width * 0.025))
                         }
-                        
-                        VStack {
+
+                        VStack(spacing: 2) {
                             Text("المرأة")
-                                .font(.system(size: geo.size.width * 0.045, weight: .bold))
-                                .foregroundColor(lightOlive)
+                                .font(.system(size: geo.size.width * 0.035, weight: .bold))
                             Text(womanFinished ? "تم السعي" : "الأشواط: \(womanRounds)")
-                                .foregroundColor(lightOlive)
+                                .font(.system(size: geo.size.width * 0.025))
                         }
                     }
-                    
+
+                    // المسار
                     ZStack {
-                        VStack {
-                            Text("الصفا")
-                                .font(.system(size: geo.size.width * 0.055, weight: .bold))
-                                .foregroundColor(lightOlive)
+
+                        // الجبال
+                        HStack {
                             Image("mountain")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: geo.size.width * 0.3)
-                        }
-                        .position(x: geo.size.width * 0.07, y: geo.size.height * 0.28)
-                        
-                        VStack {
-                            Text("المروة")
-                                .font(.system(size: geo.size.width * 0.055, weight: .bold))
-                                .foregroundColor(lightOlive)
+                                .frame(width: geo.size.width * 0.22)
+
+                            Spacer()
+
                             Image("mountain")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: geo.size.width * 0.3)
+                                .frame(width: geo.size.width * 0.22)
                         }
-                        .position(x: geo.size.width * 0.93, y: geo.size.height * 0.28)
-                        
+                        .padding(.horizontal, trackPadding)
+
+                        // ✅ النور الأخضر في النص
                         Rectangle()
                             .fill(Color.green.opacity(0.5))
-                            .frame(width: geo.size.width * 0.85, height: geo.size.height * 0.1)
-                            .position(x: geo.size.width * 0.5, y: geo.size.height * 0.32)
-                        
+                            .frame(width: greenWidth, height: trackHeight * 0.13)
+                            .position(
+                                x: geo.size.width * 0.5,
+                                y: trackHeight * 0.5
+                            )
+
+                        // الرجل
                         Image("manWalk")
                             .resizable()
                             .scaledToFit()
                             .frame(width: geo.size.width * 0.11)
-                            .scaleEffect(x: manGoingForward ? 1 : -1, y: 1)
+                            .scaleEffect(x: manGoingForward ? 1 : -1)
                             .position(
-                                x: lerp(start: geo.size.width * 0.14, end: geo.size.width * 0.86, progress: manProgress),
-                                y: geo.size.height * 0.4
+                                x: trackStartX + (trackWidth * manProgress),
+                                y: trackHeight * 0.65
                             )
-                        
+
+                        // المرأة
                         Image("womanWalk")
                             .resizable()
                             .scaledToFit()
                             .frame(width: geo.size.width * 0.11)
-                            .scaleEffect(x: womanGoingForward ? 1 : -1, y: 1)
+                            .scaleEffect(x: womanGoingForward ? 1 : -1)
                             .position(
-                                x: lerp(start: geo.size.width * 0.14, end: geo.size.width * 0.86, progress: womanProgress),
-                                y: geo.size.height * 0.5
+                                x: trackStartX + (trackWidth * womanProgress),
+                                y: trackHeight * 0.80
                             )
                     }
-                    .frame(height: geo.size.height * 0.55)
-                    
-                    HStack(spacing: geo.size.width * 0.15) {
-                        VStack {
-                            Button {
-                                if !manFinished { manAuto.toggle() }
-                            } label: {
-                                Text(manAuto ? "إيقاف الرجل" : "ابدأ الرجل")
-                                    .foregroundColor(lightOlive)
-                                    .padding()
-                                    .frame(width: geo.size.width * 0.4)
-                                    .background(Color.black.opacity(0.2))
-                            }
-                            
-                            Button {
-                                if !womanFinished { womanAuto.toggle() }
-                            } label: {
-                                Text(womanAuto ? "إيقاف المرأة" : "ابدأ المرأة")
-                                    .foregroundColor(lightOlive)
-                                    .padding()
-                                    .frame(width: geo.size.width * 0.4)
-                                    .background(Color.black.opacity(0.2))
-                            }
+                    .frame(height: trackHeight)
+
+                    // ✅ أزرار التشغيل (Color1 + كتابة بيضاء)
+                    HStack(spacing: 14) {
+                        Button {
+                            if !manFinished { manAuto.toggle() }
+                        } label: {
+                            Text(manAuto ? "إيقاف الرجل" : "ابدأ الرجل")
+                                .frame(width: startBtnW, height: 44)
+                                .background(Color("Color1"))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+
+                        Button {
+                            if !womanFinished { womanAuto.toggle() }
+                        } label: {
+                            Text(womanAuto ? "إيقاف المرأة" : "ابدأ المرأة")
+                                .frame(width: startBtnW, height: 44)
+                                .background(Color("Color1"))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
                         }
                     }
-                    
-                    HStack(spacing: geo.size.width * 0.15) {
-                        VStack {
-                            Text("تحريك الرجل")
-                                .foregroundColor(lightOlive)
-                            HStack {
-                                Button { moveMan(by: -0.05) } label: {
-                                    Image(systemName: "arrow.left")
-                                        .foregroundColor(lightOlive)
-                                        .frame(width: 60, height: 50)
-                                        .background(Color.black.opacity(0.2))
-                                }
-                                Button { moveMan(by: 0.05) } label: {
-                                    Image(systemName: "arrow.right")
-                                        .foregroundColor(lightOlive)
-                                        .frame(width: 60, height: 50)
-                                        .background(Color.black.opacity(0.2))
-                                }
-                            }
+
+                    // أزرار التحريك (تظهر فقط بالعرض)
+                    if isLandscape {
+                        HStack(spacing: 28) {
+                            controlColumn(
+                                title: "تحريك الرجل",
+                                leftAction: { moveMan(by: -0.05) },
+                                rightAction: { moveMan(by: 0.05) }
+                            )
+
+                            controlColumn(
+                                title: "تحريك المرأة",
+                                leftAction: { moveWoman(by: -0.05) },
+                                rightAction: { moveWoman(by: 0.05) }
+                            )
                         }
-                        
-                        VStack {
-                            Text("تحريك المرأة")
-                                .foregroundColor(lightOlive)
-                            HStack {
-                                Button { moveWoman(by: -0.05) } label: {
-                                    Image(systemName: "arrow.left")
-                                        .foregroundColor(lightOlive)
-                                        .frame(width: 60, height: 50)
-                                        .background(Color.black.opacity(0.2))
-                                }
-                                Button { moveWoman(by: 0.05) } label: {
-                                    Image(systemName: "arrow.right")
-                                        .foregroundColor(lightOlive)
-                                        .frame(width: 60, height: 50)
-                                        .background(Color.black.opacity(0.2))
-                                }
-                            }
-                        }
+                        .padding(.bottom, 6)
                     }
                 }
+                .foregroundColor(textColor)
             }
             .onReceive(Timer.publish(every: 0.03, on: .main, in: .common).autoconnect()) { _ in
                 if manAuto && !manFinished {
-                    let manSpeed: CGFloat = isInGreenZone(progress: manProgress) ? 0.012 : 0.006
-                    moveMan(by: manSpeed)
+                    let inGreen = manProgress > greenStartProgress && manProgress < greenEndProgress
+                    moveMan(by: inGreen ? 0.012 : 0.006)
                 }
+
                 if womanAuto && !womanFinished {
                     moveWoman(by: 0.003)
                 }
             }
         }
     }
-    
+
+    // MARK: - Controls
+    private func controlColumn(title: String,
+                               leftAction: @escaping () -> Void,
+                               rightAction: @escaping () -> Void) -> some View {
+        VStack(spacing: 10) {
+            Text(title)
+                .font(.system(size: 18, weight: .semibold))
+
+            HStack(spacing: 10) {
+                Button(action: leftAction) {
+                    Image(systemName: "arrow.left")
+                        .frame(width: 56, height: 44)
+                        .background(Color.black.opacity(0.18))
+                        .cornerRadius(10)
+                }
+
+                Button(action: rightAction) {
+                    Image(systemName: "arrow.right")
+                        .frame(width: 56, height: 44)
+                        .background(Color.black.opacity(0.18))
+                        .cornerRadius(10)
+                }
+            }
+        }
+    }
+
+    // MARK: - Speech
     func speak(_ text: String) {
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(language: "ar-SA")
         utterance.rate = 0.5
         speaker.speak(utterance)
     }
-    
-    func lerp(start: CGFloat, end: CGFloat, progress: CGFloat) -> CGFloat {
-        start + (end - start) * progress
-    }
-    
-    func isInGreenZone(progress: CGFloat) -> Bool {
-        progress > 0.3 && progress < 0.7
-    }
-    
+
+    // MARK: - Movement
     func moveMan(by amount: CGFloat) {
         manProgress += manGoingForward ? amount : -amount
-        
         if manProgress >= 1 || manProgress <= 0 {
             manProgress = 0
             manGoingForward.toggle()
             manRounds += 1
         }
-        
         if manRounds >= 7 && !manSpoken {
             manFinished = true
             manAuto = false
@@ -222,16 +240,14 @@ struct Sai: View {
             manSpoken = true
         }
     }
-    
+
     func moveWoman(by amount: CGFloat) {
         womanProgress += womanGoingForward ? amount : -amount
-        
         if womanProgress >= 1 || womanProgress <= 0 {
             womanProgress = 0
             womanGoingForward.toggle()
             womanRounds += 1
         }
-        
         if womanRounds >= 7 && !womanSpoken {
             womanFinished = true
             womanAuto = false
