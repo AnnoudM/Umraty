@@ -55,7 +55,7 @@ struct mainPage: View {
 
             VStack {
 
-                Text("عمرتي")
+                Text("My Umrah")
                     .font(.system(size: 100, weight: .bold, design: .serif))
                     .foregroundColor(Color("Color1"))
                     .opacity(viewOpacity)

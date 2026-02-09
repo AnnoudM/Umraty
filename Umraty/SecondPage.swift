@@ -1,3 +1,11 @@
+//
+//  SecondPage 2.swift
+//  Umraty
+//
+//  Created by Ghaliah alsharif on 21/08/1447 AH.
+//
+
+
 import SwiftUI
 
 struct SecondPage: View {
@@ -21,10 +29,11 @@ struct SecondPage: View {
 
                     HStack(spacing: w * 0.10) {
 
-                        NavigationLink(destination: GamesPage()) {
+                        // ✅ Games → Quiz1_shatha
+                        NavigationLink(destination: Quiz1_shatha()) {
                             SecondMenuCircleButton(
                                 imageName: "image1 1",
-                                title: "العاب",
+                                title: "Games",
                                 circleSize: circleSize,
                                 pillWidth: pillWidth,
                                 pillHeight: pillHeight,
@@ -39,7 +48,7 @@ struct SecondPage: View {
                         ) {
                             SecondMenuCircleButton(
                                 imageName: "image2",
-                                title: "تعلم العمرة",
+                                title: "Umrah Education",
                                 circleSize: circleSize,
                                 pillWidth: pillWidth,
                                 pillHeight: pillHeight,
@@ -53,7 +62,7 @@ struct SecondPage: View {
                     NavigationLink(destination: Duaa()) {
                         SecondMenuCircleButton(
                             imageName: "image3",
-                            title: "أدعية",
+                            title: "Supplication",
                             circleSize: circleSize,
                             pillWidth: pillWidth,
                             pillHeight: pillHeight,
@@ -69,7 +78,7 @@ struct SecondPage: View {
                 .padding(.horizontal, w * 0.08)
             }
         }
-        .toolbar(.hidden, for: .navigationBar) // ✅ تخفينه هنا عادي
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
@@ -120,10 +129,8 @@ struct SecondMenuCircleButton: View {
     }
 }
 
-// MARK: - صفحة مؤقتة للألعاب
-struct GamesPage: View {
-    var body: some View {
-        Text("صفحة الألعاب")
-            .font(.largeTitle)
+#Preview {
+    NavigationStack {
+        SecondPage(selectedGender: .boy) // أو .girl حسب ChildGender عندك
     }
 }
