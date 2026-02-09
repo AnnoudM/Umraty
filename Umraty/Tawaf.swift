@@ -25,6 +25,7 @@ struct Tawaf: View {
     @State private var audioStarted: Bool = false
     @State private var tawafStarted: Bool = false
 
+    // ✅ عشان نضمن ما ينادي onComplete مرتين
     @State private var didComplete: Bool = false
 
     private var walkFrame: String {
