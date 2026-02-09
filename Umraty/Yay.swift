@@ -98,19 +98,6 @@ struct GiftView: View {
                 }
                 .frame(width: screenWidth, height: screenHeight)
 
-                // 5. صورة البنت
-                VStack {
-                    Spacer()
-                    HStack {
-                        Image("girl")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 180)
-                        Spacer()
-                    }
-                    .padding(.horizontal, 40)
-                    .padding(.bottom, 20)
-                }
             }
         }
         .ignoresSafeArea()
