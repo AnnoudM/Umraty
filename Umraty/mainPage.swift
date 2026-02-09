@@ -76,7 +76,7 @@ struct mainPage: View {
                         .scaledToFit()
                         .frame(width: 800)
                         .scaleEffect(kidsScale)
-                        .offset(y: kidsBobbing ? -40 : 0) // ✅ FIX
+                        .offset(y: kidsBobbing ? -40 : 0)
                 }
             }
         }
@@ -92,8 +92,7 @@ struct mainPage: View {
     // MARK: - Animations
     func startAnimations() {
 
-        // 👦 حركة لطيفة بدون كسر الأرض
-        withAnimation(
+                withAnimation(
             .easeInOut(duration: 1.5)
                 .repeatForever(autoreverses: true)
         ) {
