@@ -59,7 +59,7 @@ struct Quiz1_shatha: View {
 
                 HStack {
                     VStack(spacing: 70) {
-                        Image("boy").resizable().frame(width: 130, height: 300)
+                        Image("no").resizable().frame(width: 130, height: 300)
                         Image("boy2").resizable().frame(width: 130, height: 300)
                     }.padding(.leading, 50)
                     Spacer()
