@@ -316,7 +316,7 @@ struct UmrahStepRouterView: View {
             }
 
         } else if step == 3 {
-            FirstSai(selectedGender: <#ChildGender#>)
+            FirstSai()
 
         } else if step == 4 {
             if selectedGender == .girl {
