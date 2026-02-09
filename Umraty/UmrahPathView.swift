@@ -31,12 +31,12 @@ struct UmrahPathView: View {
                 Color(red: 0.85, green: 0.93, blue: 0.85).ignoresSafeArea()
 
                 VStack(spacing: 0) {
+                    Spacer(minLength: geo.size.height * 0.08)
 
                     Text("umrah_steps_title")
-                        .font(.system(size: min(w, h) * 0.085, weight: .bold))
+                        .font(.system(size: min(w, h) * 0.07, weight: .bold))
                         .foregroundColor(Color("Color1"))
                         .shadow(color: Color.black.opacity(0.15), radius: 3, x: 0, y: 3)
-                        .padding(.top, h * 0.07)
 
                     Spacer()
 
@@ -169,7 +169,7 @@ struct StepNode: View {
 
                 Text("\(step)")
                     .font(.system(size: numberSize, weight: .heavy))
-                    .foregroundColor(Color(red: 0.55, green: 0.7, blue: 0.7))
+                    .foregroundColor(Color("Color1"))
                     .shadow(color: Color.black.opacity(0.15), radius: 3, x: 0, y: 3)
                     .offset(y: circleSize * 0.95)
             }
