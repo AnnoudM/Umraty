@@ -317,8 +317,9 @@ struct UmrahStepRouterView: View {
             }
 
         } else if step == 3 {
-            FirstSai()
-
+            SaiLessonView {
+                completeStep(3) }
+                
         } else if step == 4 {
             if selectedGender == .girl {
                 ThllPagegirl_suha()
