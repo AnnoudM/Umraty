@@ -51,7 +51,7 @@ struct UmrahPathView: View {
                             .frame(width: w * 0.78, height: h * 0.22)
                             .position(x: w * 0.54, y: centerY)
 
-                        ForEach(1...5, id: \.self) { step in
+                        ForEach(1...4, id: \.self) { step in
                             StepNode(
                                 step: step,
                                 currentStep: currentStep,
@@ -100,30 +100,29 @@ struct UmrahPathView: View {
     }
     }
 
-    private func nodePosition(step: Int, w: CGFloat, centerY: CGFloat) -> CGPoint {
-        let points: [CGPoint] = [
-            CGPoint(x: w * 0.20, y: centerY + 10),
-            CGPoint(x: w * 0.36, y: centerY - 2),
-            CGPoint(x: w * 0.50, y: centerY - 10),
-            CGPoint(x: w * 0.64, y: centerY - 6),
-            CGPoint(x: w * 0.78, y: centerY - 14)
-        ]
-        return points[max(0, min(step - 1, points.count - 1))]
-    }
+private func nodePosition(step: Int, w: CGFloat, centerY: CGFloat) -> CGPoint {
+    let points: [CGPoint] = [
+        CGPoint(x: w * 0.18, y: centerY + 18),  // step 1
+        CGPoint(x: w * 0.40, y: centerY - 10),  // step 2
+        CGPoint(x: w * 0.63, y: centerY + 6),   // step 3
+        CGPoint(x: w * 0.86, y: centerY - 18)   // step 4
+    ]
+    return points[max(0, min(step - 1, points.count - 1))]
+}
 
     private func characterPosition(base: CGPoint, yOffset: CGFloat) -> CGPoint {
         CGPoint(x: base.x, y: base.y - yOffset)
     }
 
-    private func iconAssetName(step: Int) -> String {
-        switch step {
-        case 1: return "ihram"
-        case 2: return "tawaf"
-        case 3: return "sai"
-        case 4: return "tah"
-        default: return "quizz"
-        }
+private func iconAssetName(step: Int) -> String {
+    switch step {
+    case 1: return "ihram"
+    case 2: return "tawaf"
+    case 3: return "sai"
+    case 4: return "tah"
+    default: return "ihram" // احتياط فقط
     }
+}
 
 
 // MARK: - StepNode
@@ -151,7 +150,7 @@ struct StepNode: View {
                     .frame(width: circleSize, height: circleSize)
                     .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 6)
 
-                let isBig = (step == 2 || step == 3 || step == 5)
+                let isBig = (step == 2 || step == 3)
                 let scale: CGFloat = isBig ? 2.1 : 1.55
 
                 Image(iconAssetName)
@@ -291,13 +290,13 @@ struct UmrahStepRouterView: View {
     }
 
     private func setCurrentStep(_ newValue: Int) {
-        let v = max(1, min(newValue, 5))
+        let v = max(1, min(newValue, 4))
         if selectedGender == .boy { progressBoy = v } else { progressGirl = v }
     }
 
     private func completeStep(_ step: Int) {
         let current = getCurrentStep()
-        if step == current && current < 5 {
+        if step == current && current < 4 {
             setCurrentStep(current + 1)
         }
     }
@@ -328,7 +327,7 @@ struct UmrahStepRouterView: View {
             }
 
         } else {
-            StepDetailView(step: step) { completeStep(step) }
+            EmptyView()
         }
     }
 }
