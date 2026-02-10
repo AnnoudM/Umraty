@@ -38,9 +38,7 @@ struct SaiLessonView: View {
 
                         Spacer(minLength: geo.size.height * 0.08)
                     } else {
-                        // نخلي فيه مسافة بسيطة بدل العنوان عشان ما يخرب الترتيب
-                        Spacer(minLength: geo.size.height * 0.04)
-                    }
+                        Spacer(minLength: 0)                    }
 
                     // ✅ هذا يخلي المحتوى ينزل للنص شوي
                     Group {
@@ -57,10 +55,10 @@ struct SaiLessonView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
-                    Spacer(minLength: geo.size.height * 0.05)
+                    Spacer(minLength: showSaiSection ? 0 : geo.size.height * 0.05)
                 }
-                .padding(.horizontal, geo.size.width * 0.05)
-                .padding(.bottom, 16)
+                .padding(.horizontal, showSaiSection ? 0 : geo.size.width * 0.05)
+                .padding(.bottom, showSaiSection ? 0 : 16)
 
             }
         }

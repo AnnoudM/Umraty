@@ -74,7 +74,9 @@ struct Tawaf: View {
 
                 } else if completedRounds < totalRounds {
 
-                    Text("Rounds \(min(completedRounds + 1, totalRounds)) / \(totalRounds)")
+                    Text(String(format: NSLocalizedString("tawaf_rounds", comment: ""),
+                                "\(min(completedRounds + 1, totalRounds))",
+                                "\(totalRounds)"))
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.white)
                         .padding(.horizontal, 28)
