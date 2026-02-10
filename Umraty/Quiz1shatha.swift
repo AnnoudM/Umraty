@@ -123,25 +123,25 @@ struct Quiz1_shatha: View {
                     }
                     
                     // 5. زر التالي (يظهر في الزاوية اليمين تحت)
+                    // 5. زر التالي (بالنص تحت)
                     if showNextButton {
                         VStack {
                             Spacer()
-                            HStack {
-                                Spacer()
-                                NavigationLink(destination: Quiz2View()) {
-                                    Text("التالي")
-                                        .font(.system(size: 30, weight: .bold))
-                                        .foregroundColor(.white)
-                                        .padding(.vertical, 15)
-                                        .padding(.horizontal, 40)
-                                        .background(Color.orange)
-                                        .cornerRadius(20)
-                                        .shadow(radius: 5)
-                                }
-                                .padding(.trailing, 50)
-                                .padding(.bottom, 50)
+
+                            NavigationLink(destination: Quiz2View()) {
+                                Text("التالي")
+                                    .font(.system(size: 30, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding(.vertical, 15)
+                                    .padding(.horizontal, 60)
+                                    .background(Color("Color1"))   // ✅ لون الباكراوند المطلوب
+                                    .cornerRadius(20)
+                                    .shadow(radius: 5)
                             }
+
+                            .padding(.bottom, 50)
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom) // ✅ يضمنه بالنص تحت
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                         .zIndex(20)
                     }

@@ -149,20 +149,24 @@ struct Quiz6View: View {
                     if showNextButton {
                         VStack {
                             Spacer()
-                            HStack {
-                                Spacer()
-                                // تأكد من وجود Quiz7shathaView في مشروعك
-                                NavigationLink(destination: Quiz7shathaView()) {
-                                    Text("التالي").font(.system(size: 30, weight: .bold)).foregroundColor(.white)
-                                        .padding(.vertical, 15).padding(.horizontal, 40)
-                                        .background(Color.orange).cornerRadius(20).shadow(radius: 5)
-                                }
-                                .padding(.trailing, 50).padding(.bottom, 50)
+
+                            NavigationLink(destination: Quiz7shathaView()) {
+                                Text("التالي")
+                                    .font(.system(size: 30, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding(.vertical, 15)
+                                    .padding(.horizontal, 60)
+                                    .background(Color("Color1"))
+                                    .cornerRadius(20)
+                                    .shadow(radius: 5)
                             }
+                            .padding(.bottom, 50)
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom) // ✅ بالنص تحت
                         .zIndex(15)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
+
                 }
             }
         }
