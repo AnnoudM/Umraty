@@ -78,7 +78,6 @@ struct SecondPage: View {
                 .padding(.horizontal, w * 0.08)
             }
         }
-        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
@@ -87,8 +86,7 @@ struct SecondPage: View {
 struct SecondMenuCircleButton: View {
 
     let imageName: String
-    let title: String
-
+    let title: LocalizedStringKey
     let circleSize: CGFloat
     let pillWidth: CGFloat
     let pillHeight: CGFloat

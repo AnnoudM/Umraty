@@ -34,7 +34,7 @@ struct Tawaf: View {
     var body: some View {
         ZStack {
 
-            Image("background2")
+            Image("Background")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
@@ -47,7 +47,7 @@ struct Tawaf: View {
             Image("Kaaba")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 900)
+                .frame(width: 800)
                 .offset(y: kaabaYOffset)
                 .zIndex(1)
 

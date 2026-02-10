@@ -48,6 +48,39 @@
 "step_title_sai" = "السعي";
 "step_title_tahallul" = "التحلل";
 "step_title_quiz" = "الاختبار";
+<<<<<<< HEAD
 "Rounds" = "الشوط";
 "Start Tawaf" = " ابدا الطواف";
 "Tawaf is complete" = "اكتمل الطواف!";
+=======
+
+/* عنوان الصفحة الرئيسي */
+"finalPage_title" = "تطوري مع العمرة";
+
+/* العنوان الفرعي */
+"finalPage_subtitle" = "ماذا تعلمت في هذه الرحلة :";
+
+/* خطوات العمرة */
+"step_ihram" = "الإحرام";
+"step_tawaf" = "الطواف";
+"step_sai" = "السعي";
+"step_thallul" = "التحلل";
+
+/* صفحة التحلل */
+"thllPage_title" = "التحلل من العمرة";
+"thllPage_instruction" = "اسحب المقص لتقصير الشعر أو الماكينة للحلق";
+
+/* أزرار المقص والماكينة */
+"button_cut" = "تقصير";
+"button_shave" = "حلق";
+
+/* أزرار التحكم */
+"button_next" = "التالي";
+"button_restart" = "إعادة اللعب";
+"thllPagegirl_instruction" = "اسحبي المقص لتقصير الشعر";
+
+"My Umrah" = "عمرتي";
+"Games" ="الألعاب";
+"Umrah Education" ="تعليم العمرة";
+"Supplication" = "أدعية";
+>>>>>>> main

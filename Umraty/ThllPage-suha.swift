@@ -3,6 +3,10 @@ import AVFoundation
 
 struct ThllPage_suha: View {
     
+    // MARK: - RTL Support
+    @Environment(\.layoutDirection) private var layoutDirection
+    var rtlMultiplier: CGFloat { layoutDirection == .rightToLeft ? -1 : 1 }
+    
     // MARK: - States
     @State private var hairImage = "ولد بشعر"
     
@@ -26,24 +30,22 @@ struct ThllPage_suha: View {
     
     // حالة السهم المتحرك
     @State private var pulseArrow = false
-
+    
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                
                 // 🌿 الخلفية
                 Color(red: 0.85, green: 0.93, blue: 0.85)
                     .ignoresSafeArea()
                 
                 VStack(spacing: 16) {
-                    
                     // العنوان
-                    Text("التحلل من العمرة")
-                        .font(.system(size: 42, weight: .bold))
-                        .foregroundColor(Color(red: 0.5, green: 0.5, blue: 0.0))
+                    Text("thllPage_title")
+                        .font(.system(size: 70, weight: .bold))
+                        .foregroundColor(Color.color1)
                     
-                    Text("اسحب المقص لتقصير الشعر أو الماكينة للحلق")
-                        .font(.system(size: 26))
+                    Text("thllPage_instruction")
+                        .font(.system(size: 50))
                         .foregroundColor(.black.opacity(0.7))
                     
                     Spacer()
@@ -74,7 +76,11 @@ struct ThllPage_suha: View {
                                     .gesture(
                                         DragGesture()
                                             .onChanged { value in
-                                                scissorsOffset = value.translation
+                                                // الحركة فوق شعر الولد
+                                                scissorsOffset = CGSize(
+                                                    width: value.translation.width * rtlMultiplier,
+                                                    height: value.translation.height - 30
+                                                )
                                                 if player?.isPlaying == false { playCutSound() }
                                             }
                                             .onEnded { _ in
@@ -83,16 +89,16 @@ struct ThllPage_suha: View {
                                             }
                                     )
                                 
-                                Text("تقصير")
-                                    .font(.system(size: 36, weight: .bold))
+                                Text("button_cut")
+                                    .font(.system(size: 40, weight: .bold))
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
-                                    .background(Color(red: 0.5, green: 0.5, blue: 0.0))
+                                    .background(Color.color1)
                                     .cornerRadius(12)
                             }
                             .position(
-                                x: scissorsX ?? geo.size.width * 0.85,
+                                x: scissorsX ?? geo.size.width * 0.15,
                                 y: geo.size.height * 0.25
                             )
                         }
@@ -108,7 +114,11 @@ struct ThllPage_suha: View {
                                     .gesture(
                                         DragGesture()
                                             .onChanged { value in
-                                                razorOffset = value.translation
+                                                // الحركة فوق شعر الولد
+                                                razorOffset = CGSize(
+                                                    width: value.translation.width * rtlMultiplier,
+                                                    height: value.translation.height - 30
+                                                )
                                                 if player?.isPlaying == false { playShaveSound() }
                                             }
                                             .onEnded { _ in
@@ -117,16 +127,16 @@ struct ThllPage_suha: View {
                                             }
                                     )
                                 
-                                Text("حلق")
-                                    .font(.system(size: 36, weight: .bold))
+                                Text("button_shave")
+                                    .font(.system(size: 40, weight: .bold))
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
-                                    .background(Color(red: 0.5, green: 0.5, blue: 0.0))
+                                    .background(Color.color1)
                                     .cornerRadius(12)
                             }
                             .position(
-                                x: razorX ?? geo.size.width * 0.85,
+                                x: razorX ?? geo.size.width * 0.15,
                                 y: geo.size.height * 0.60
                             )
                         }
@@ -140,11 +150,9 @@ struct ThllPage_suha: View {
                     Spacer()
                 }
                 
-                // 🔘 أزرار موحدة باللون الزيتي
+                // 🔘 الأزرار بعد الانتهاء
                 if !showScissors && !showRazor {
                     HStack(spacing: 40) {
-                        
-                        // 🔁 إعادة اللعب
                         Button {
                             resetGame()
                         } label: {
@@ -152,25 +160,19 @@ struct ThllPage_suha: View {
                                 .font(.system(size: 32, weight: .bold))
                                 .foregroundColor(.white)
                                 .padding(22)
-                                .background(
-                                    Circle().fill(Color(red: 0.5, green: 0.5, blue: 0.0))
-                                )
+                                .background(Circle().fill(Color.color1))
                                 .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
                         }
                         
-                        // ⏭️ التالي
                         NavigationLink(destination: UmrahPathView(selectedGender: .boy)) {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 32, weight: .bold))
                                 .foregroundColor(.white)
                                 .padding(22)
-                                .background(
-                                    Circle().fill(Color(red: 0.5, green: 0.5, blue: 0.0))
-                                )
+                                .background(Circle().fill(Color.color1))
                                 .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
                                 .scaleEffect(pulseArrow ? 1.15 : 1)
                         }
-                        .transition(.scale.combined(with: .opacity))
                         .onAppear {
                             withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) {
                                 pulseArrow = true
@@ -208,17 +210,20 @@ struct ThllPage_suha: View {
         playCutSound()
         dropHair = true
         
+        let centerX = geo.size.width * 0.5
         withAnimation(.easeInOut(duration: 0.5)) {
-            scissorsX = geo.size.width * 0.75
+            scissorsX = centerX
             scissorsOffset = .zero
         }
         
         isCutting = true
-        
         var count = 0
+        
         Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { timer in
             withAnimation(.easeInOut(duration: 0.18)) {
-                scissorsOffset.width = (count % 2 == 0 ? 30 : -30)
+                let offsetAmount: CGFloat = 30
+                scissorsOffset.width = (count % 2 == 0 ? offsetAmount : -offsetAmount)
+                scissorsOffset.height = 0
             }
             count += 1
             
