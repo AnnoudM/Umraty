@@ -1,8 +1,4 @@
-//
-//  Quiz1-shatha.swift
-//  Umraty
-//
-//  Created by Shatha Ghayath Aljabal  on 02/02/2026.
+
 
 import SwiftUI
 import AVFoundation

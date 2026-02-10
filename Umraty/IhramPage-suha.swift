@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFoundation
 
 struct IhramPage_suha_girl: View {
     
@@ -6,34 +7,28 @@ struct IhramPage_suha_girl: View {
     @State private var zoomForbidden = false
     @State private var showArrow = false
     @State private var pulseArrow = false
+    @State private var audioPlayer: AVAudioPlayer?
     
-    // ✅ نحتاجها عشان نرجع للباث
     @Environment(\.dismiss) private var dismiss
-    
-    // ✅ نحدث التقدم للبنت
     @AppStorage("umrah_progress_girl") private var progressGirl: Int = 1
     
     var body: some View {
         ZStack {
-            // الخلفية
             Color(red: 0.85, green: 0.93, blue: 0.85)
                 .ignoresSafeArea()
             
             VStack(spacing: 30) {
                 
-                // العنوان
                 Text("الإحرام")
                     .font(.system(size: 70, weight: .bold))
-                    .foregroundColor(Color.color1) // اللون زيتي
+                    .foregroundColor(Color.color1)
                     .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 3)
                 
                 Divider()
-                
                 Spacer()
                 
                 HStack(spacing: 60) {
                     
-                    // ❌ الممنوع
                     VStack(spacing: 30) {
                         Image("مقص")
                             .resizable()
@@ -58,13 +53,11 @@ struct IhramPage_suha_girl: View {
                         alignment: .top
                     )
                     
-                    // 👧 البنت بدون الحجاب
                     Image("بنت بدون حجاب")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 380)
                     
-                    // ✅ المسموح (الحجاب)
                     Image("حجاب البنت")
                         .resizable()
                         .scaledToFit()
@@ -82,12 +75,10 @@ struct IhramPage_suha_girl: View {
                 
                 Spacer()
                 
-                // ⏭️ زر السهم (يظهر بعد انتهاء الأنيميشن)
                 if showArrow {
                     Button {
-                        // ✅ افتحي المرحلة اللي بعدها
+                        audioPlayer?.stop()
                         if progressGirl < 2 { progressGirl = 2 }
-                        // ✅ رجعي لصفحة الباث
                         dismiss()
                     } label: {
                         Image(systemName: "chevron.right")
@@ -118,7 +109,9 @@ struct IhramPage_suha_girl: View {
             .padding(.horizontal, 40)
             .onAppear {
                 
-                // 1️⃣ تكبير المسموح
+                playAudio()
+                
+                // allowed
                 withAnimation(.easeInOut(duration: 0.9)) {
                     zoomAllowed = true
                 }
@@ -128,7 +121,7 @@ struct IhramPage_suha_girl: View {
                     }
                 }
                 
-                // 2️⃣ تكبير الممنوع
+                // forbidden
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     withAnimation(.easeInOut(duration: 0.8)) {
                         zoomForbidden = true
@@ -139,14 +132,32 @@ struct IhramPage_suha_girl: View {
                         }
                     }
                 }
+            }
+            .onDisappear {
+                audioPlayer?.stop()
+            }
+        }
+    }
+    
+    func playAudio() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+            
+            if let url = Bundle.main.url(forResource: "Girl_Ihram_audio", withExtension: "wav") {
+                audioPlayer = try AVAudioPlayer(contentsOf: url)
+                audioPlayer?.prepareToPlay()
+                audioPlayer?.play()
                 
-                // 3️⃣ إظهار زر السهم بعد انتهاء كل الأنيميشن
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.2) {
+                let duration = audioPlayer?.duration ?? 0
+                DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                     withAnimation(.easeInOut) {
                         showArrow = true
                     }
                 }
             }
+        } catch {
+            print(error)
         }
     }
 }

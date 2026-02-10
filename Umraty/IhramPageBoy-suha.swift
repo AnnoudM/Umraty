@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFoundation
 
 struct IhramPageBoy_suha: View {
     
@@ -6,35 +7,29 @@ struct IhramPageBoy_suha: View {
     @State private var zoomForbidden = false
     @State private var pulseArrow = false
     @State private var showArrow = false
+    @State private var audioPlayer: AVAudioPlayer?
     
-    // ✅ نحتاجها عشان نرجع للباث
     @Environment(\.dismiss) private var dismiss
-    
-    // ✅ نحدث التقدم للولد
     @AppStorage("umrah_progress_boy") private var progressBoy: Int = 1
     
     var body: some View {
         ZStack {
             
-            // الخلفية
             Color(red: 0.85, green: 0.93, blue: 0.85)
                 .ignoresSafeArea()
             
             VStack(spacing: 30) {
                 
-                // العنوان
                 Text("الإحرام")
                     .font(.system(size: 70, weight: .bold))
-                    .foregroundColor(Color.color1) // اللون زيتي
+                    .foregroundColor(Color.color1)
                     .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 3)
                 
                 Divider()
-                
                 Spacer()
                 
                 HStack(spacing: 60) {
                     
-                    // ❌ الممنوع
                     VStack(spacing: 30) {
                         Image("مقص")
                             .resizable()
@@ -59,13 +54,11 @@ struct IhramPageBoy_suha: View {
                         alignment: .top
                     )
                     
-                    // 👦 الطفل
                     Image("الولد بدون احرام")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 480)
                     
-                    // ✅ المسموح
                     Image("احرام فقط")
                         .resizable()
                         .scaledToFit()
@@ -83,27 +76,17 @@ struct IhramPageBoy_suha: View {
                 
                 Spacer()
                 
-                // ⏭️ زر السهم (يظهر بعد انتهاء الأنيميشن)
                 if showArrow {
                     Button {
-                        // ✅ افتحي المرحلة اللي بعدها
+                        audioPlayer?.stop()
                         if progressBoy < 2 { progressBoy = 2 }
-                        // ✅ رجعي لصفحة الباث
                         dismiss()
                     } label: {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 32, weight: .bold))
                             .foregroundColor(.white)
                             .padding(22)
-                            .background(
-                                Circle().fill(
-                                    LinearGradient(
-                                        colors: [Color.color1, Color.color1],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                            )
+                            .background(Circle().fill(Color.color1))
                             .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
                             .scaleEffect(pulseArrow ? 1.15 : 1)
                     }
@@ -119,7 +102,8 @@ struct IhramPageBoy_suha: View {
             .padding(.horizontal, 40)
             .onAppear {
                 
-                // 1️⃣ تكبير المسموح
+                playAudio()
+                
                 withAnimation(.easeInOut(duration: 0.9)) {
                     zoomAllowed = true
                 }
@@ -129,7 +113,6 @@ struct IhramPageBoy_suha: View {
                     }
                 }
                 
-                // 2️⃣ تكبير الممنوع
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     withAnimation(.easeInOut(duration: 0.8)) {
                         zoomForbidden = true
@@ -140,14 +123,32 @@ struct IhramPageBoy_suha: View {
                         }
                     }
                 }
+            }
+            .onDisappear {
+                audioPlayer?.stop()
+            }
+        }
+    }
+    
+    func playAudio() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+            
+            if let url = Bundle.main.url(forResource: "Boy_Ihram_audio", withExtension: "wav") {
+                audioPlayer = try AVAudioPlayer(contentsOf: url)
+                audioPlayer?.prepareToPlay()
+                audioPlayer?.play()
                 
-                // 3️⃣ إظهار زر السهم بعد انتهاء كل الأنيميشن
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3.2) {
+                let duration = audioPlayer?.duration ?? 0
+                DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                     withAnimation(.easeInOut) {
                         showArrow = true
                     }
                 }
             }
+        } catch {
+            print(error)
         }
     }
 }

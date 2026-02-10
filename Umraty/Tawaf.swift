@@ -213,5 +213,5 @@ struct Tawaf: View {
 }
 
 #Preview {
-    Tawaf(selectedGender: .girl) { }
+    Tawaf(selectedGender: .boy) { }
 }
