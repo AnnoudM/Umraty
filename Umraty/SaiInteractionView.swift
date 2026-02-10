@@ -46,8 +46,8 @@ struct SaiInteractionView: View {
             let trackEndX = geo.size.width - trackPadding
             let trackWidth = trackEndX - trackStartX
 
-            // ✅ لوحة المسار
-            let trackHeight = geo.size.height * (isLandscape ? 0.30 : 0.36)
+            // ✅ لوحة المسار (نرفعها شوي عشان ما تقرب من الأزرار)
+            let trackHeight = geo.size.height * (isLandscape ? 0.28 : 0.33)
 
             // ✅ أحجام
             let mountainW = trackHeight * 1.15
@@ -56,16 +56,16 @@ struct SaiInteractionView: View {
 
             // ✅ أماكن العناصر
             let groundY = trackHeight * 0.92
-            let mtnY = trackHeight * 0.95
-            let manY = trackHeight * 1.10
-            let womanY = trackHeight * 1.30
+            let mtnY = trackHeight * 0.25
+            let manY = trackHeight * 0.45
+            let womanY = trackHeight * 0.70
 
             let leftMtnX = trackStartX + trackWidth * 0.20
             let rightMtnX = trackStartX + trackWidth * 0.80
 
             // ✅ الأخضر بينهم
             let greenX = (leftMtnX + rightMtnX) / 2
-            let greenY = trackHeight * 0.70
+            let greenY = trackHeight * 0.20
 
             // ✅ منطقة الهرولة (للمنطق)
             let greenWidth = trackWidth * 0.22
@@ -82,12 +82,14 @@ struct SaiInteractionView: View {
                     .scaledToFill()
                     .ignoresSafeArea()
 
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: isLandscape ? 12 : 16) {
+                // ✅ نخلي المحتوى يملى الشاشة، والأزرار تروح لأسفل الصفحة
+                VStack(spacing: 0) {
 
+                    // ✅ الجزء العلوي (عداد + المسار)
+                    VStack(spacing: isLandscape ? 12 : 16) {
                         Spacer(minLength: geo.size.height * 0.03)
 
-                        // ✅ عداد الأشواط (مظبوط)
+                        // ✅✅ عداد الأشواط (فوق بالنص)
                         HStack(spacing: geo.size.width * 0.10) {
                             counterCard(
                                 title: "الرجل",
@@ -101,6 +103,12 @@ struct SaiInteractionView: View {
                             )
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
+                        .offset(
+                            x: geo.size.width * -0.03,   // ➜ يمين شوي
+                            y: -geo.size.height * 0.20  // ➜ فوق عند الغيوم
+                        )
+
+                        // ✅⬅️ هنا التغيير الوحيد (رفع للأعلى بالنص)
 
                         // ✅ المسار
                         ZStack {
@@ -148,10 +156,17 @@ struct SaiInteractionView: View {
                         }
                         .frame(height: trackHeight)
                         .environment(\.layoutDirection, .leftToRight)
+                    }
+                    .padding(.horizontal, geo.size.width * 0.05)
+                    .foregroundColor(textColor)
 
-                        Spacer(minLength: isLandscape ? geo.size.height * 0.02 : geo.size.height * 0.03)
+                    // ✅ هذا يفصل بين المسار والأزرار ويضمن ما يصير تلامس
+                    Spacer(minLength: geo.size.height * 0.06)
 
-                        // ✅ أزرار التشغيل (يمين شوي)
+                    // ✅ الأزرار دائمًا بأسفل الصفحة
+                    VStack(spacing: 14) {
+
+                        // ✅ أزرار التشغيل
                         HStack(spacing: 14) {
                             Button {
                                 if !manFinished { manAuto.toggle() }
@@ -176,7 +191,7 @@ struct SaiInteractionView: View {
                         .frame(maxWidth: .infinity, alignment: .center)
                         .offset(x: buttonsShiftRight)
 
-                        // ✅ التحكم اليدوي (يمين شوي)
+                        // ✅ التحكم اليدوي
                         HStack(spacing: 22) {
                             manualControl(
                                 title: "تحريك الرجل",
@@ -191,7 +206,6 @@ struct SaiInteractionView: View {
                             )
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 6)
                         .offset(x: buttonsShiftRight)
 
                         if showArrow {
@@ -214,14 +228,11 @@ struct SaiInteractionView: View {
                                     pulseArrow = true
                                 }
                             }
-                            .padding(.top, 8)
+                            .padding(.top, 4)
                         }
-
-                        Spacer(minLength: 14)
                     }
                     .padding(.horizontal, geo.size.width * 0.05)
-                    .padding(.bottom, 10)
-                    .frame(minHeight: geo.size.height * 0.98, alignment: .top)
+                    .padding(.bottom, max(18, geo.safeAreaInsets.bottom + 12))
                     .foregroundColor(textColor)
                 }
             }
@@ -311,7 +322,7 @@ struct SaiInteractionView: View {
         if manRounds >= 7 && !manSpoken {
             manFinished = true
             manAuto = false
-            manRounds = 7 // ✅ تثبيت على 7
+            manRounds = 7
             speak("تم الانتهاء من السعي للرجل")
             manSpoken = true
         }
@@ -335,7 +346,7 @@ struct SaiInteractionView: View {
         if womanRounds >= 7 && !womanSpoken {
             womanFinished = true
             womanAuto = false
-            womanRounds = 7 // ✅ تثبيت على 7
+            womanRounds = 7
             speak("تم الانتهاء من السعي للمرأة")
             womanSpoken = true
         }
