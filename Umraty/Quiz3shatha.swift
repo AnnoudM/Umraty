@@ -13,30 +13,31 @@ struct Quiz3View: View {
     @State private var audioPlayer: AVAudioPlayer?
     @State private var showWrongImage = false
     @State private var isInteractionDisabled = false
-    
-    // متغيرات النجمة
+
     @State private var showStar = false
     @State private var starRotation = 0.0
     @State private var starScale = 1.0
     @State private var starPosition: CGPoint = .zero
-    
+
     @State private var showNextButton = false
-    
+
     let columns = [
         GridItem(.flexible(), spacing: 20),
         GridItem(.flexible(), spacing: 20)
     ]
-    
+
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .topTrailing) {
-                
-                // 1. الخلفية
+
                 Color(red: 0.85, green: 0.93, blue: 0.85)
                     .ignoresSafeArea()
-                Image("background").resizable().ignoresSafeArea()
 
-                // 2. رقم السؤال
+                Image("background")
+                    .resizable()
+                    .opacity(0.2) // ✅ نفس Quiz2
+                    .ignoresSafeArea()
+
                 Image("السؤال الثالث")
                     .resizable()
                     .scaledToFit()
@@ -45,7 +46,6 @@ struct Quiz3View: View {
                     .padding(.trailing, 30)
                     .zIndex(5)
 
-                // 3. الأمواج
                 VStack {
                     Spacer()
                     HStack(alignment: .bottom) {
@@ -62,33 +62,45 @@ struct Quiz3View: View {
                 }
                 .ignoresSafeArea()
 
-                // 4. النجوم والأنيميشن
+                // ✅ نظام النجوم + تفعيل زر التالي (نفس Quiz2)
                 ZStack {
-                    // نجوم ثابتة من الأسئلة السابقة
+                    // نجمتين ثابتة (من الأسئلة السابقة)
                     Image("star")
-                        .frame(width: 250, height: 250).scaleEffect(0.2)
+                        .frame(width: 250, height: 250)
+                        .scaleEffect(0.2)
                         .position(x: (geometry.size.width / 2) - 70, y: 260)
+
                     Image("star")
-                        .frame(width: 250, height: 250).scaleEffect(0.2)
+                        .frame(width: 250, height: 250)
+                        .scaleEffect(0.2)
                         .position(x: (geometry.size.width / 2), y: 260)
-                    
+
                     if showStar {
                         Image("star")
                             .frame(width: 250, height: 250)
                             .scaleEffect(starScale)
                             .rotationEffect(.degrees(starRotation))
-                            .position(starPosition == .zero ? CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2) : starPosition)
+                            .position(
+                                starPosition == .zero
+                                ? CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                                : starPosition
+                            )
                             .onAppear {
                                 starPosition = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
                                 starScale = 2.0
-                                withAnimation(.easeInOut(duration: 2.0)) { starRotation = 360 }
-                                
+
+                                withAnimation(.easeInOut(duration: 2.0)) {
+                                    starRotation = 360
+                                }
+
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                                     withAnimation(.easeInOut(duration: 1.5)) {
                                         starPosition = CGPoint(x: (geometry.size.width / 2) + 70, y: 260)
                                         starScale = 0.2
                                     }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+
+                                    // ✅ نفس توقيت Quiz2
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                                         withAnimation { showNextButton = true }
                                     }
                                 }
@@ -97,16 +109,21 @@ struct Quiz3View: View {
                 }
                 .zIndex(10)
 
-                // 5. المحتوى الرئيسي
                 VStack(spacing: 0) {
-                    Image("s").resizable().scaledToFit().frame(width: 500).padding(.top, 100)
+                    Image("s")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 500)
+                        .padding(.top, 30) // ✅ نفس Quiz2 تقريبًا
+
                     Spacer()
+
                     VStack(spacing: 40) {
                         Text("ماذا نكرر كثيرا في طريقنا إلى الكعبة؟")
-                            .font(.system(size: 30, weight: .bold))
-                            .multilineTextAlignment(.center).padding(.horizontal, 30)
-                        
-                        // هنا تم تعديل الأزرار لحل المشكلة التي واجهتِك
+                            .font(.system(size: 35, weight: .bold))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 30)
+
                         LazyVGrid(columns: columns, spacing: 20) {
                             Quiz3Button(text: "السلام") { checkAnswer(isCorrect: false) }
                             Quiz3Button(text: "التلبية") { checkAnswer(isCorrect: true) }
@@ -116,48 +133,50 @@ struct Quiz3View: View {
                         .padding(.horizontal, geometry.size.width * 0.05)
                         .disabled(isInteractionDisabled)
                     }
-                    Spacer()
+
                     Spacer()
                 }
 
-                // 6. زر التالي (ينقل لـ Quiz4View)
+                // ✅ زر التالي (ينقل لـ Quiz4View) — نفس ستايل Quiz2
                 if showNextButton {
                     VStack {
                         Spacer()
-                        HStack {
-                            Spacer()
-                            NavigationLink(destination: Quiz4View()) {
-                                Text("التالي")
-                                    .font(.system(size: 30, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .padding(.vertical, 15)
-                                    .padding(.horizontal, 40)
-                                    .background(Color.orange)
-                                    .cornerRadius(20)
-                                    .shadow(radius: 5)
-                            }
-                            .padding(.trailing, 50).padding(.bottom, 50)
+
+                        NavigationLink(destination: Quiz4View()) {
+                            Text("التالي")
+                                .font(.system(size: 30, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.vertical, 15)
+                                .padding(.horizontal, 60)
+                                .background(Color("Color1"))
+                                .cornerRadius(20)
+                                .shadow(radius: 5)
                         }
+                        .padding(.bottom, 50)
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .zIndex(15)
                 }
 
                 if showWrongImage {
-                    Image("wrong").resizable().scaledToFit().frame(width: 500, height: 500)
-                        .zIndex(20).position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                    Image("wrong")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 500, height: 500)
+                        .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                        .zIndex(2)
                 }
             }
         }
-        .navigationBarBackButtonHidden(true)
+        .navigationBarHidden(true)
     }
-    
-    // دالة التحقق من الإجابة
+
     func checkAnswer(isCorrect: Bool) {
         isInteractionDisabled = true
         if isCorrect {
             playSound(named: "correctanswer")
-            withAnimation { showStar = true }
+            withAnimation { showStar = true }  // ✅ نفس Quiz2
         } else {
             playSound(named: "incorrectanswer")
             withAnimation(.spring()) { showWrongImage = true }
@@ -170,23 +189,21 @@ struct Quiz3View: View {
         }
     }
 
-    func playSound(named fileName: String) {
-        if let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") {
+    func playSound(named name: String) {
+        if let url = Bundle.main.url(forResource: name, withExtension: "mp3") {
             audioPlayer = try? AVAudioPlayer(contentsOf: url)
             audioPlayer?.play()
         }
     }
 }
 
-// MARK: - مكون الزر (تم تصحيحه)
+// MARK: - زر الخيارات (خاص بكويز 3)
 struct Quiz3Button: View {
     let text: String
     let action: () -> Void
-    
+
     var body: some View {
-        Button(action: {
-            action()
-        }) {
+        Button(action: { action() }) {
             Text(text)
                 .font(.system(size: 22, weight: .bold))
                 .foregroundColor(.black)
@@ -199,9 +216,8 @@ struct Quiz3Button: View {
     }
 }
 
-// المعاينة
 #Preview {
     NavigationStack {
-        Quiz3shatha()
+        Quiz3View()
     }
 }

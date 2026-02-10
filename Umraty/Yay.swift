@@ -3,17 +3,17 @@
 //  Umraty
 //
 //  Created by Shatha Ghayath Aljabal  on 04/02/2026.
+//
 
 import SwiftUI
 import AVFoundation
 
-// MARK: - مشغل الصوت المطور
+// MARK: - مشغل الصوت
 class GiftSoundManager {
     static let instance = GiftSoundManager()
     var player: AVAudioPlayer?
 
     func playYay() {
-        // تأكدي أن اسم الملف في المشروع هو "yaysound" وبصيغة mp3
         guard let url = Bundle.main.url(forResource: "yaysound", withExtension: "mp3") else {
             print("❌ ملف الصوت غير موجود")
             return
@@ -22,7 +22,7 @@ class GiftSoundManager {
             player = try AVAudioPlayer(contentsOf: url)
             player?.play()
         } catch {
-            print("❌ خطأ في تشغيل الصوت: \(error.localizedDescription)")
+            print("❌ خطأ في تشغيل الصوت")
         }
     }
 }
@@ -30,48 +30,47 @@ class GiftSoundManager {
 struct GiftView: View {
     @State private var isOpened = false
     @State private var startFalling = false
-    @Environment(\.dismiss) var dismiss // للرجوع للصفحة السابقة
-    
+
     var body: some View {
         GeometryReader { geometry in
             let screenWidth = geometry.size.width
             let screenHeight = geometry.size.height
-            
+
             ZStack {
-                // 1. الخلفية
+                // الخلفية
                 Color(red: 0.85, green: 0.93, blue: 0.85)
                     .ignoresSafeArea()
+
                 Image("background")
                     .resizable()
                     .opacity(0.2)
                     .ignoresSafeArea()
 
-                // 2. النصوص العلوية
+                // النص العلوي
                 VStack {
                     Text("هناك هدية لك لحصولك على ٧ نجوم")
                         .font(.system(size: 30, weight: .bold))
-                        .foregroundColor(.black)
                         .padding(.top, 100)
-                    
+
                     if !isOpened {
                         Text("اضغط على هديتك لفتحها")
                             .font(.system(size: 30, weight: .bold))
-                            .foregroundColor(.black)
                             .padding(.top, 20)
                     }
+
                     Spacer()
                 }
                 .zIndex(5)
 
-                // 3. المفرقعات
+                // المفرقعات
                 if isOpened {
-                    ForEach(0..<15) { i in
+                    ForEach(0..<15) { _ in
                         Image("fire")
                             .resizable()
                             .frame(width: 300, height: 300)
                             .brightness(-0.2)
                             .position(
-                                x: CGFloat.random(in: 50...screenWidth-50),
+                                x: CGFloat.random(in: 50...screenWidth - 50),
                                 y: startFalling ? screenHeight + 200 : -200
                             )
                             .animation(
@@ -83,7 +82,7 @@ struct GiftView: View {
                     }
                 }
 
-                // 4. منطقة الهدية وزر الرجوع
+                // الهدية + زر الرجوع
                 VStack(spacing: 30) {
                     if !isOpened {
                         Image("open")
@@ -91,38 +90,31 @@ struct GiftView: View {
                             .scaledToFit()
                             .frame(width: 400)
                             .onTapGesture {
-                                GiftSoundManager.instance.playYay() // تشغيل الصوت
+                                GiftSoundManager.instance.playYay()
                                 withAnimation(.spring(response: 0.6, dampingFraction: 0.6)) {
                                     isOpened = true
                                     startFalling = true
                                 }
                             }
                     } else {
-                        // محتوى ما بعد فتح الهدية
                         Image("هدية")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 450)
-                            .transition(.asymmetric(
-                                insertion: .scale(scale: 0.1).combined(with: .opacity),
-                                removal: .opacity
-                            ))
-                        
-                        // زر العودة الذي طلبتيه
-                        Button(action: {
-                            dismiss() // يغلق صفحة الهدية ويعود لـ SecondPage
-                        }) {
-                            HStack {
-                                Image(systemName: "arrow.right.circle.fill")
-                                Text("العودة للمجموعة")
-                            }
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(.white)
-                            .padding(.vertical, 15)
-                            .padding(.horizontal, 40)
-                            .background(Color(red: 0.43, green: 0.59, blue: 0.57))
-                            .cornerRadius(20)
-                            .shadow(color: .gray.opacity(0.5), radius: 10, x: 0, y: 5)
+                            .transition(.scale.combined(with: .opacity))
+
+                        // ✅ زر العودة للمجموعة
+                        NavigationLink(
+                            destination: SecondPage(selectedGender: .boy)
+                        ) {
+                            Text("العودة للمجموعة")
+                                .font(.system(size: 28, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.vertical, 15)
+                                .padding(.horizontal, 60)
+                                .background(Color("Color1"))   // ✅ نفس لون باقي الأزرار
+                                .cornerRadius(20)
+                                .shadow(radius: 5)
                         }
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
@@ -135,7 +127,7 @@ struct GiftView: View {
     }
 }
 
-// MARK: - معاينة الكود
+// MARK: - Preview
 #Preview {
     NavigationStack {
         GiftView()
