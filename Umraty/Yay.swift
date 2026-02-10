@@ -5,18 +5,24 @@
 //  Created by Shatha Ghayath Aljabal  on 04/02/2026.
 
 import SwiftUI
-import AVFoundation // مكتبة الصوت
+import AVFoundation
 
-// تعريف مشغل الصوت خارج الـ Struct لضمان كفاءة الأداء
-var audioPlayer: AVAudioPlayer?
+// MARK: - مشغل الصوت المطور
+class GiftSoundManager {
+    static let instance = GiftSoundManager()
+    var player: AVAudioPlayer?
 
-func playYaySound() {
-    if let path = Bundle.main.path(forResource: "yaysound", ofType: "mp3") { // تأكد أن الصيغة mp3 أو wav
+    func playYay() {
+        // تأكدي أن اسم الملف في المشروع هو "yaysound" وبصيغة mp3
+        guard let url = Bundle.main.url(forResource: "yaysound", withExtension: "mp3") else {
+            print("❌ ملف الصوت غير موجود")
+            return
+        }
         do {
-            audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path))
-            audioPlayer?.play()
+            player = try AVAudioPlayer(contentsOf: url)
+            player?.play()
         } catch {
-            print("خطأ: تعذر تشغيل ملف الصوت")
+            print("❌ خطأ في تشغيل الصوت: \(error.localizedDescription)")
         }
     }
 }
@@ -24,6 +30,7 @@ func playYaySound() {
 struct GiftView: View {
     @State private var isOpened = false
     @State private var startFalling = false
+    @Environment(\.dismiss) var dismiss // للرجوع للصفحة السابقة
     
     var body: some View {
         GeometryReader { geometry in
@@ -32,19 +39,26 @@ struct GiftView: View {
             
             ZStack {
                 // 1. الخلفية
-                Image("background").resizable()
                 Color(red: 0.85, green: 0.93, blue: 0.85)
                     .ignoresSafeArea()
+                Image("background")
+                    .resizable()
+                    .opacity(0.2)
+                    .ignoresSafeArea()
 
-                // 2. النص العلوي
+                // 2. النصوص العلوية
                 VStack {
                     Text("هناك هدية لك لحصولك على ٧ نجوم")
-                        .font(.system(size: 35, weight: .bold))
+                        .font(.system(size: 30, weight: .bold))
                         .foregroundColor(.black)
-                        .padding(.top, 160)
-                    Text("اضغط على هديتك لفتحها")                        .font(.system(size: 35, weight: .bold))
-                        .foregroundColor(.black)
-                        .padding(.top, 30)
+                        .padding(.top, 100)
+                    
+                    if !isOpened {
+                        Text("اضغط على هديتك لفتحها")
+                            .font(.system(size: 30, weight: .bold))
+                            .foregroundColor(.black)
+                            .padding(.top, 20)
+                    }
                     Spacer()
                 }
                 .zIndex(5)
@@ -55,8 +69,7 @@ struct GiftView: View {
                         Image("fire")
                             .resizable()
                             .frame(width: 300, height: 300)
-                            .brightness(-0.5)
-                            .contrast(1.5)
+                            .brightness(-0.2)
                             .position(
                                 x: CGFloat.random(in: 50...screenWidth-50),
                                 y: startFalling ? screenHeight + 200 : -200
@@ -70,40 +83,61 @@ struct GiftView: View {
                     }
                 }
 
-                // 4. منطقة الهدية و Open
-                ZStack {
+                // 4. منطقة الهدية وزر الرجوع
+                VStack(spacing: 30) {
                     if !isOpened {
                         Image("open")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 400)
                             .onTapGesture {
-                                // تشغيل الصوت فور الضغط
-                                playYaySound()
-                                
-                                withAnimation(.spring()) {
+                                GiftSoundManager.instance.playYay() // تشغيل الصوت
+                                withAnimation(.spring(response: 0.6, dampingFraction: 0.6)) {
                                     isOpened = true
-                                }
-                                withAnimation {
                                     startFalling = true
                                 }
                             }
                     } else {
+                        // محتوى ما بعد فتح الهدية
                         Image("هدية")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 450)
-                            .transition(.scale.combined(with: .opacity))
+                            .transition(.asymmetric(
+                                insertion: .scale(scale: 0.1).combined(with: .opacity),
+                                removal: .opacity
+                            ))
+                        
+                        // زر العودة الذي طلبتيه
+                        Button(action: {
+                            dismiss() // يغلق صفحة الهدية ويعود لـ SecondPage
+                        }) {
+                            HStack {
+                                Image(systemName: "arrow.right.circle.fill")
+                                Text("العودة للمجموعة")
+                            }
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.vertical, 15)
+                            .padding(.horizontal, 40)
+                            .background(Color(red: 0.43, green: 0.59, blue: 0.57))
+                            .cornerRadius(20)
+                            .shadow(color: .gray.opacity(0.5), radius: 10, x: 0, y: 5)
+                        }
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                 }
                 .frame(width: screenWidth, height: screenHeight)
-
             }
         }
+        .navigationBarHidden(true)
         .ignoresSafeArea()
     }
 }
 
+// MARK: - معاينة الكود
 #Preview {
-    GiftView()
+    NavigationStack {
+        GiftView()
+    }
 }

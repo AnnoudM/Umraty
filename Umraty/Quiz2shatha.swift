@@ -8,7 +8,7 @@
 import SwiftUI
 import AVFoundation
 
-// MARK: - 1. السؤال الثاني (ينقل إلى الثالث)
+// MARK: - 1. السؤال الثاني
 struct Quiz2View: View {
     @State private var audioPlayer: AVAudioPlayer?
     @State private var showWrongImage = false
@@ -18,7 +18,6 @@ struct Quiz2View: View {
     @State private var starScale = 1.0
     @State private var starPosition: CGPoint = .zero
     
-    // متغير ظهور زر التالي
     @State private var showNextButton = false
     
     let columns = [
@@ -30,14 +29,12 @@ struct Quiz2View: View {
         GeometryReader { geometry in
             ZStack(alignment: .topTrailing) {
                 
-                // الخلفية
                 Color(red: 0.85, green: 0.93, blue: 0.85)
                     .ignoresSafeArea()
                 Image("background").resizable()
                     .opacity(0.2)
                     .ignoresSafeArea()
 
-                // رقم السؤال
                 Image("السؤال الثاني")
                     .resizable()
                     .scaledToFit()
@@ -46,14 +43,13 @@ struct Quiz2View: View {
                     .padding(.trailing, 30)
                     .zIndex(5)
 
-                // الأمواج
                 VStack {
                     Spacer()
                     HStack(alignment: .bottom) {
-                        Image("wave1").resizable().scaledToFit()
+                        Image("wave").resizable().scaledToFit()
                             .frame(width: geometry.size.width * 0.25)
                         Spacer()
-                        Image("wave").resizable().scaledToFit()
+                        Image("wave1").resizable().scaledToFit()
                             .frame(width: geometry.size.width * 0.25)
                     }
                 }
@@ -61,13 +57,15 @@ struct Quiz2View: View {
 
                 // نظام النجوم
                 ZStack {
-                    // نجمة السؤال الأول (ثابتة في الخانة الأولى)
-                    Image("star").resizable().frame(width: 250, height: 250)
+                    // نجمة السؤال الأول (ثابتة - تم تعديل y إلى 260)
+                    Image("star")
+                        .frame(width: 250, height: 250)
                         .scaleEffect(0.2)
-                        .position(x: (geometry.size.width / 2) - 35, y: 160)
+                        .position(x: (geometry.size.width / 2) - 35, y: 260)
                     
                     if showStar {
-                        Image("star").resizable().frame(width: 250, height: 250)
+                        Image("star")
+                            .frame(width: 250, height: 250)
                             .scaleEffect(starScale)
                             .rotationEffect(.degrees(starRotation))
                             .position(starPosition == .zero ? CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2) : starPosition)
@@ -78,10 +76,10 @@ struct Quiz2View: View {
                                 
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                                     withAnimation(.easeInOut(duration: 1.5)) {
-                                        starPosition = CGPoint(x: (geometry.size.width / 2) + 35, y: 160)
+                                        // تم تعديل y إلى 260
+                                        starPosition = CGPoint(x: (geometry.size.width / 2) + 35, y: 260)
                                         starScale = 0.2
                                     }
-                                    // ظهور زر التالي بعد استقرار النجمة
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                                         withAnimation { showNextButton = true }
                                     }
@@ -90,13 +88,12 @@ struct Quiz2View: View {
                     }
                 }.zIndex(10)
 
-                // المحتوى
                 VStack(spacing: 0) {
-                    Image("s").resizable().scaledToFit().frame(width: 400).padding(.top, 30)
+                    Image("s").resizable().scaledToFit().frame(width: 500).padding(.top, 100)
                     Spacer()
                     VStack(spacing: 50) {
                         Text("كم عدد أشواط الطواف حول الكعبة؟")
-                            .font(.system(size: 40, weight: .bold))
+                            .font(.system(size: 30, weight: .bold))
                             .multilineTextAlignment(.center).padding(.horizontal, 30)
                         
                         LazyVGrid(columns: columns, spacing: 20) {
@@ -105,13 +102,13 @@ struct Quiz2View: View {
                             QuizOptionButton(text: "٨ أشواط", isCorrect: false, action: checkAnswer)
                             QuizOptionButton(text: "٧ أشواط", isCorrect: true, action: checkAnswer)
                         }
-                        .padding(.horizontal, geometry.size.width * 0.08)
+                        .padding(.horizontal, geometry.size.width * 0.05)
                         .disabled(isInteractionDisabled)
                     }
                     Spacer()
+                    Spacer()
                 }
 
-                // زر الانتقال للسؤال الثالث
                 if showNextButton {
                     VStack {
                         Spacer()
@@ -188,21 +185,25 @@ struct Quiz3shatha: View {
                 VStack {
                     Spacer()
                     HStack(alignment: .bottom) {
-                        Image("wave1").resizable().scaledToFit().frame(width: geometry.size.width * 0.25)
-                        Spacer()
                         Image("wave").resizable().scaledToFit().frame(width: geometry.size.width * 0.25)
+                        Spacer()
+                        Image("wave1").resizable().scaledToFit().frame(width: geometry.size.width * 0.25)
                     }
                 }.ignoresSafeArea()
 
+                // نظام النجوم
                 ZStack {
-                    // النجمتان السابقتان ثابتتان في مكانهما
-                    Image("star").resizable().frame(width: 250, height: 250).scaleEffect(0.2)
-                        .position(x: (geometry.size.width / 2) - 70, y: 160)
-                    Image("star").resizable().frame(width: 250, height: 250).scaleEffect(0.2)
-                        .position(x: (geometry.size.width / 2), y: 160)
+                    // النجمتان السابقتان (ثابتتان - تم تعديل y إلى 260)
+                    Image("star")
+                        .frame(width: 250, height: 250).scaleEffect(0.2)
+                        .position(x: (geometry.size.width / 2) - 70, y: 260)
+                    Image("star")
+                        .frame(width: 250, height: 250).scaleEffect(0.2)
+                        .position(x: (geometry.size.width / 2), y: 260)
                     
                     if showStar {
-                        Image("star").resizable().frame(width: 250, height: 250)
+                        Image("star")
+                            .frame(width: 250, height: 250)
                             .scaleEffect(starScale).rotationEffect(.degrees(starRotation))
                             .position(starPosition == .zero ? CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2) : starPosition)
                             .onAppear {
@@ -211,7 +212,8 @@ struct Quiz3shatha: View {
                                 withAnimation(.easeInOut(duration: 2.0)) { starRotation = 360 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                                     withAnimation(.easeInOut(duration: 1.5)) {
-                                        starPosition = CGPoint(x: (geometry.size.width / 2) + 70, y: 160)
+                                        // تم تعديل y إلى 260
+                                        starPosition = CGPoint(x: (geometry.size.width / 2) + 70, y: 260)
                                         starScale = 0.2
                                     }
                                 }
@@ -220,18 +222,18 @@ struct Quiz3shatha: View {
                 }.zIndex(10)
 
                 VStack(spacing: 0) {
-                    Image("s").resizable().scaledToFit().frame(width: 400).padding(.top, 30)
+                    Image("s").resizable().scaledToFit().frame(width: 500).padding(.top, 30)
                     Spacer()
                     VStack(spacing: 40) {
                         Text("ماذا نكرر كثيرا في طريقنا إلى الكعبة؟")
                             .font(.system(size: 35, weight: .bold)).multilineTextAlignment(.center).padding(.horizontal, 30)
                         LazyVGrid(columns: columns, spacing: 20) {
-                            Quiz3Button(text: "السلام", isCorrect: false, action: checkAnswer)
-                            Quiz3Button(text: "التلبية", isCorrect: true, action: checkAnswer)
-                            Quiz3Button(text: "الأذان", isCorrect: false, action: checkAnswer)
-                            Quiz3Button(text: "التشهد", isCorrect: false, action: checkAnswer)
+                            QuizOptionButton(text: "السلام", isCorrect: false, action: checkAnswer)
+                            QuizOptionButton(text: "التلبية", isCorrect: true, action: checkAnswer)
+                            QuizOptionButton(text: "الأذان", isCorrect: false, action: checkAnswer)
+                            QuizOptionButton(text: "التشهد", isCorrect: false, action: checkAnswer)
                         }
-                        .padding(.horizontal, geometry.size.width * 0.08)
+                        .padding(.horizontal, geometry.size.width * 0.05)
                         .disabled(isInteractionDisabled)
                     }
                     Spacer()
@@ -286,25 +288,6 @@ struct QuizOptionButton: View {
         }
     }
 }
-
-struct Quiz3View: View {
-    let text: String
-    let isCorrect: Bool
-    let action: (Bool) -> Void
-    var body: some View {
-        Button(action: { action(isCorrect) }) {
-            Text(text)
-                .font(.system(size: 22, weight: .bold))
-                .foregroundColor(.black)
-                .frame(maxWidth: .infinity)
-                .frame(height: 100)
-                .background(Color(red: 0.92, green: 0.72, blue: 0.64))
-                .cornerRadius(20)
-                .shadow(radius: 5)
-        }
-    }
-}
-
 #Preview {
     NavigationStack {
         Quiz2View()

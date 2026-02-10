@@ -9,7 +9,7 @@ import SwiftUI
 import AVFoundation
 
 // MARK: - Model
-struct DraggableItemQuiz7: Identifiable {
+struct DraggableItemQuiz7shatha: Identifiable {
     let id = UUID()
     let text: String
     let correctOrder: Int
@@ -19,13 +19,15 @@ struct DraggableItemQuiz7: Identifiable {
 }
 
 // MARK: - Quiz 7 View
-struct Quiz7View: View {
+struct Quiz7shathaView: View {
+    @Environment(\.layoutDirection) var layoutDirection
+    
     @State private var audioPlayer: AVAudioPlayer?
     @State private var items = [
-        DraggableItemQuiz7(text: "الطواف", correctOrder: 1),
-        DraggableItemQuiz7(text: "التحلل", correctOrder: 3),
-        DraggableItemQuiz7(text: "الإحرام", correctOrder: 0),
-        DraggableItemQuiz7(text: "السعي", correctOrder: 2)
+        DraggableItemQuiz7shatha(text: "الطواف", correctOrder: 1),
+        DraggableItemQuiz7shatha(text: "التحلل", correctOrder: 3),
+        DraggableItemQuiz7shatha(text: "الإحرام", correctOrder: 0),
+        DraggableItemQuiz7shatha(text: "السعي", correctOrder: 2)
     ].shuffled()
     
     @State private var targets: [String?] = [nil, nil, nil, nil]
@@ -43,36 +45,33 @@ struct Quiz7View: View {
                 ZStack(alignment: .topTrailing) {
                     
                     // 1. الخلفية
-                    Image("background").resizable()
+                    Image("background").resizable().ignoresSafeArea()
                     Color(red: 0.85, green: 0.93, blue: 0.85).ignoresSafeArea()
 
-                    // 2. النجوم الستة السابقة
+                    // 2. النجوم الستة السابقة (الآن عند y: 260)
                     ZStack {
                         ForEach(0..<6) { i in
                             Image("star")
-                                .resizable()
                                 .frame(width: 250, height: 250)
                                 .scaleEffect(0.2)
-                                .position(x: (geometry.size.width / 2) - 175 + CGFloat(i * 70), y: 160)
+                                .position(x: (geometry.size.width / 2) - 210 + CGFloat(i * 70), y: 260)
                         }
                     }
 
-                    // 3. محتوى السؤال
+                    // 3. محتوى السؤال الرئيسي
                     VStack {
                         HStack {
                             Spacer()
-                            Image("s").resizable().scaledToFit().frame(width: 300)
+                            Image("s").resizable().scaledToFit().frame(width: 500)
                             Spacer()
-                        }.padding(.horizontal).padding(.top, 20)
+                        }.padding(.horizontal).padding(.top, 100)
 
                         Text("رتب خطوات العمرة الصحيحة؟")
-                            .font(.system(size: 35, weight: .bold))
-                            .padding(.top, 160)
-
-                        Spacer()
+                            .font(.system(size: 30, weight: .bold))
+                            .padding(.top, 220)
 
                         HStack(spacing: 60) {
-                            // قطع السحب
+                            // قطع السحب (الكلمات)
                             VStack(spacing: 40) {
                                 ForEach(items.indices, id: \.self) { index in
                                     if !items[index].isPlaced {
@@ -80,12 +79,13 @@ struct Quiz7View: View {
                                             .font(.system(size: 45, weight: .bold))
                                             .foregroundColor(.black)
                                             .frame(width: 230, height: 85)
-                                            .background(Color.white.opacity(0.1))
+                                            .background(Color.white.opacity(0.1)) // خلفية شفافة لسهولة اللمس
                                             .offset(items[index].offset)
                                             .zIndex(items[index].isDragging ? 100 : 1)
                                             .gesture(DragGesture(coordinateSpace: .global)
                                                 .onChanged { value in
-                                                    items[index].offset = value.translation
+                                                    let multiplier: CGFloat = (layoutDirection == .rightToLeft) ? -1 : 1
+                                                    items[index].offset = CGSize(width: value.translation.width * multiplier, height: value.translation.height)
                                                     items[index].isDragging = true
                                                 }
                                                 .onEnded { value in
@@ -99,7 +99,7 @@ struct Quiz7View: View {
                                 }
                             }
                             
-                            // صناديق الإسقاط
+                            // صناديق الإسقاط (الأرقام)
                             VStack(spacing: 30) {
                                 ForEach(0..<4) { i in
                                     HStack(spacing: 15) {
@@ -116,12 +116,7 @@ struct Quiz7View: View {
                                 }
                             }
                         }
-                        
                         Spacer()
-                        HStack {
-                            Image("girl").resizable().scaledToFit().frame(width: 150)
-                            Spacer()
-                        }.padding(.horizontal, 40).padding(.bottom, 40)
                     }
                     
                     // صورة اسم المرحلة
@@ -132,10 +127,9 @@ struct Quiz7View: View {
                         .padding(.top, 40)
                         .padding(.trailing, 30)
 
-                    // 4. النجمة السابعة
+                    // 4. النجمة السابعة (تظهر عند الحل الصحيح)
                     if showStar {
                         Image("star")
-                            .resizable()
                             .frame(width: 250, height: 250)
                             .scaleEffect(starScale)
                             .rotationEffect(.degrees(starRotation))
@@ -149,7 +143,8 @@ struct Quiz7View: View {
                                 
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                                     withAnimation(.easeInOut(duration: 1.5)) {
-                                        starPosition = CGPoint(x: (geometry.size.width / 2) + 245, y: 160)
+                                        // الموضع الجديد بجانب النجوم الستة عند y: 260
+                                        starPosition = CGPoint(x: (geometry.size.width / 2) + 210, y: 260)
                                         starScale = 0.2
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
@@ -159,7 +154,7 @@ struct Quiz7View: View {
                             }
                     }
 
-                    // 5. زر الانتقال
+                    // 5. زر استلام الهدية
                     if showNextButton {
                         VStack {
                             Spacer()
@@ -184,16 +179,23 @@ struct Quiz7View: View {
                 }
             }
         }
-        .navigationBarBackButtonHidden(true) // حذف إمكانية الرجوع
+        .navigationBarBackButtonHidden(true)
     }
 
+    // منطق الإسقاط والتحقق
     func handleDrop(index: Int, value: DragGesture.Value, geometry: GeometryProxy) {
         let correctIdx = items[index].correctOrder
         let dropLocation = value.location
+        let screenWidth = geometry.size.width
         let screenHeight = geometry.size.height
         
-        if dropLocation.x > (geometry.size.width * 0.5) {
+        let isRightToLeft = layoutDirection == .rightToLeft
+        // تحديد منطقة الإسقاط بناءً على اتجاه اللغة
+        let isInDropZone = isRightToLeft ? (dropLocation.x < screenWidth * 0.5) : (dropLocation.x > screenWidth * 0.5)
+
+        if isInDropZone {
             var targetIndex: Int? = nil
+            // تقسيم الشاشة طولياً لتحديد الصندوق
             if dropLocation.y < screenHeight * 0.45 { targetIndex = 0 }
             else if dropLocation.y < screenHeight * 0.58 { targetIndex = 1 }
             else if dropLocation.y < screenHeight * 0.72 { targetIndex = 2 }
@@ -227,19 +229,6 @@ struct Quiz7View: View {
         }
     }
 }
-
-// شاشة الهدية كمثال للوجهة
-struct YayView: View {
-    var body: some View {
-        ZStack {
-            Color(red: 0.85, green: 0.93, blue: 0.85).ignoresSafeArea()
-            Text("🎁 مبروك الهدية!")
-                .font(.largeTitle).bold()
-        }
-        .navigationBarBackButtonHidden(true)
-    }
-}
-
 #Preview {
-    Quiz7View()
+    Quiz7shathaView()
 }
