@@ -1,5 +1,4 @@
 
-
 import SwiftUI
 import AVFoundation
 
@@ -15,7 +14,7 @@ struct Tawaf: View {
     private let kaabaYOffset: CGFloat = 120
 
     private let totalRounds: Int = 7
-    private let roundDuration: Double = 5
+    private let roundDuration: Double = 3
 
     @State private var progress: Double = 0.0
     @State private var completedRounds: Int = 0
@@ -47,7 +46,7 @@ struct Tawaf: View {
             Image("Kaaba")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 800)
+                .frame(width: 750)
                 .offset(y: kaabaYOffset)
                 .zIndex(1)
 
@@ -56,44 +55,58 @@ struct Tawaf: View {
                     .zIndex(2)
             }
 
+            // 🔹 TOP UI
             VStack {
-                if tawafStarted {
+
+                if !tawafStarted {
+
+                    Button(action: startTawaf) {
+                        Text("Start Tawaf")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 28)
+                            .padding(.vertical, 14)
+                            .background(Color("Color1"))
+                            .clipShape(Capsule())
+                            .shadow(radius: 4)
+                    }
+                    .padding(.top, 24)
+
+                } else if completedRounds < totalRounds {
+
                     Text("Rounds \(min(completedRounds + 1, totalRounds)) / \(totalRounds)")
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(.blue)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 14)
+                        .background(Color("Color1"))
+                        .clipShape(Capsule())
+                        .shadow(radius: 4)
+                        .padding(.top, 24)
+
+                } else {
+
+                    Text("Tawaf is completed!")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 14)
+                        .background(Color("Color1"))
+                        .clipShape(Capsule())
+                        .shadow(radius: 4)
                         .padding(.top, 24)
                 }
+
                 Spacer()
             }
             .zIndex(3)
-
-            VStack {
-                Spacer()
-
-                if completedRounds == totalRounds {
-
-                    Text("Tawaf is completed!")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(.blue)
-                        .padding(.bottom, 40)
-
-                } else if !tawafStarted {
-
-                    Button("Start Tawaf") {
-                        startTawaf()
-                    }
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(.blue)
-                    .padding(.bottom, 40)
-                }
-            }
-            .zIndex(5)
         }
         .onDisappear {
             stopTawafAudio()
         }
     }
 
+    // MARK: - Character
     private func walkingCharacter(
         flipped: Bool,
         opacity: Double
@@ -112,22 +125,33 @@ struct Tawaf: View {
             .scaledToFit()
             .frame(width: characterSize)
             .scaleEffect(x: flipped ? 1 : -1, y: 1)
-            .position(
-                x: centerX + x,
-                y: centerY + y
-            )
+            .position(x: centerX + x, y: centerY + y)
             .opacity(opacity)
     }
 
+    // MARK: - Audio (FIXED & DEBUG SAFE)
     private func playTawafAudio() {
         guard !audioStarted else { return }
         audioStarted = true
 
-        let audioName = selectedGender == .boy ? "tawafaudio_boy" : "tawafaudio_girl"
-        guard let url = Bundle.main.url(forResource: audioName, withExtension: "mp3") else { return }
+        let audioName = selectedGender == .boy
+            ? "tawafaudio_boy"
+            : "tawafaudio_girl"
 
-        audioPlayer = try? AVAudioPlayer(contentsOf: url)
-        audioPlayer?.play()
+        guard let url = Bundle.main.url(forResource: audioName, withExtension: "mp3") else {
+            print("❌ Audio file NOT found:", audioName)
+            return
+        }
+
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.numberOfLoops = -1   // 🔁 loop during tawaf
+            audioPlayer?.prepareToPlay()
+            audioPlayer?.play()
+            print("✅ Playing audio:", audioName)
+        } catch {
+            print("❌ Audio error:", error.localizedDescription)
+        }
     }
 
     private func stopTawafAudio() {
@@ -136,6 +160,7 @@ struct Tawaf: View {
         audioStarted = false
     }
 
+    // MARK: - Tawaf Logic
     private func startTawaf() {
         didComplete = false
         tawafStarted = true
@@ -145,7 +170,6 @@ struct Tawaf: View {
         animateRound()
     }
 
-    // ✅ THIS is where navigation happens
     private func animateRound() {
 
         if completedRounds == totalRounds {
@@ -155,8 +179,6 @@ struct Tawaf: View {
 
             if !didComplete {
                 didComplete = true
-
-                // optional 2-second pause before moving on
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     onComplete()
                 }
