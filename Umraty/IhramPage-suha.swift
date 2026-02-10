@@ -7,6 +7,12 @@ struct IhramPage_suha_girl: View {
     @State private var showArrow = false
     @State private var pulseArrow = false
     
+    // ✅ نحتاجها عشان نرجع للباث
+    @Environment(\.dismiss) private var dismiss
+    
+    // ✅ نحدث التقدم للبنت
+    @AppStorage("umrah_progress_girl") private var progressGirl: Int = 1
+    
     var body: some View {
         ZStack {
             // الخلفية
@@ -78,9 +84,12 @@ struct IhramPage_suha_girl: View {
                 
                 // ⏭️ زر السهم (يظهر بعد انتهاء الأنيميشن)
                 if showArrow {
-                    NavigationLink(
-                        destination: UmrahPathView(selectedGender: .girl)
-                    ) {
+                    Button {
+                        // ✅ افتحي المرحلة اللي بعدها
+                        if progressGirl < 2 { progressGirl = 2 }
+                        // ✅ رجعي لصفحة الباث
+                        dismiss()
+                    } label: {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 32, weight: .bold))
                             .foregroundColor(.white)
@@ -88,10 +97,7 @@ struct IhramPage_suha_girl: View {
                             .background(
                                 Circle().fill(
                                     LinearGradient(
-                                        colors: [
-                                            Color.color1,  // زيتي فاتح
-                                            Color.color1 // زيتي غامق
-                                        ],
+                                        colors: [Color.color1, Color.color1],
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     )
@@ -100,6 +106,7 @@ struct IhramPage_suha_girl: View {
                             .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
                             .scaleEffect(pulseArrow ? 1.15 : 1)
                     }
+                    .buttonStyle(.plain)
                     .transition(.scale.combined(with: .opacity))
                     .onAppear {
                         withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) {
