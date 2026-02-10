@@ -4,7 +4,6 @@ import AVFoundation
 
 struct SaiInteractionView: View {
 
-    // MARK: - External
     var onDone: () -> Void
 
     // MARK: - Man
@@ -38,20 +37,47 @@ struct SaiInteractionView: View {
 
             let startBtnW = min(geo.size.width * 0.28, 220)
 
+            // ✅ إزاحة بسيطة لليمين للأزرار (كما طلبتي)
+            let buttonsShiftRight = geo.size.width * -0.03
+
+            // ✅ مسار الحركة
             let trackPadding = geo.size.width * 0.10
             let trackStartX = trackPadding
             let trackEndX = geo.size.width - trackPadding
             let trackWidth = trackEndX - trackStartX
 
-            // منطقة الهرولة (الأخضر) وسط المسار
+            // ✅ لوحة المسار
+            let trackHeight = geo.size.height * (isLandscape ? 0.30 : 0.36)
+
+            // ✅ أحجام
+            let mountainW = trackHeight * 1.15
+            let charW = trackHeight * 0.70
+            let greenHeight = trackHeight * 0.12
+
+            // ✅ أماكن العناصر
+            let groundY = trackHeight * 0.92
+            let mtnY = trackHeight * 0.95
+            let manY = trackHeight * 1.10
+            let womanY = trackHeight * 1.30
+
+            let leftMtnX = trackStartX + trackWidth * 0.20
+            let rightMtnX = trackStartX + trackWidth * 0.80
+
+            // ✅ الأخضر بينهم
+            let greenX = (leftMtnX + rightMtnX) / 2
+            let greenY = trackHeight * 0.70
+
+            // ✅ منطقة الهرولة (للمنطق)
             let greenWidth = trackWidth * 0.22
             let greenStartProgress = ((trackWidth * 0.5) - (greenWidth / 2)) / trackWidth
             let greenEndProgress   = ((trackWidth * 0.5) + (greenWidth / 2)) / trackWidth
 
-            let trackHeight = geo.size.height * (isLandscape ? 0.28 : 0.36)
+            // ✅ عرض الأشواط بشكل ثابت 0/7 .. 7/7
+            let manShown = min(manRounds, 7)
+            let womanShown = min(womanRounds, 7)
 
             ZStack {
-                Image("BackgroundSai")
+                Image("background2")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
@@ -61,72 +87,71 @@ struct SaiInteractionView: View {
 
                         Spacer(minLength: geo.size.height * 0.03)
 
-                        Text("السعي بين الصفا والمروة")
-                            .font(.system(size: geo.size.width * 0.05, weight: .bold))
-                            .foregroundColor(textColor)
-                            .minimumScaleFactor(0.7)
-
-                        Spacer(minLength: geo.size.height * 0.02)
-
-                        // عداد الأشواط
+                        // ✅ عداد الأشواط (مظبوط)
                         HStack(spacing: geo.size.width * 0.10) {
-                            counterCard(title: "الرجل",
-                                        value: manFinished ? "تم السعي ✅" : "الأشواط: \(manRounds)/7",
-                                        geo: geo)
-                            counterCard(title: "المرأة",
-                                        value: womanFinished ? "تم السعي ✅" : "الأشواط: \(womanRounds)/7",
-                                        geo: geo)
+                            counterCard(
+                                title: "الرجل",
+                                value: "الأشواط: \(manShown)/7" + (manFinished ? " ✅" : ""),
+                                geo: geo
+                            )
+                            counterCard(
+                                title: "المرأة",
+                                value: "الأشواط: \(womanShown)/7" + (womanFinished ? " ✅" : ""),
+                                geo: geo
+                            )
                         }
+                        .frame(maxWidth: .infinity, alignment: .center)
 
-                        // المسار
+                        // ✅ المسار
                         ZStack {
-                            HStack {
-                                Image("mountain")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: geo.size.width * 0.22)
-                                Spacer()
-                                Image("mountain")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: geo.size.width * 0.22)
-                            }
-                            .padding(.horizontal, trackPadding)
+                            Rectangle()
+                                .fill(Color.black.opacity(0.001))
+                                .frame(width: trackWidth, height: 1)
+                                .position(x: trackStartX + trackWidth * 0.5, y: groundY)
 
-                            // الأخضر بالنص
+                            Image("mountain")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: mountainW)
+                                .position(x: leftMtnX, y: mtnY)
+
+                            Image("mountain")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: mountainW)
+                                .position(x: rightMtnX, y: mtnY)
+
                             Rectangle()
                                 .fill(Color.green.opacity(0.45))
-                                .frame(width: greenWidth, height: trackHeight * 0.13)
-                                .position(
-                                    x: trackStartX + (trackWidth * 0.5),
-                                    y: trackHeight * 0.52
-                                )
+                                .frame(width: greenWidth, height: greenHeight)
+                                .position(x: greenX, y: greenY)
 
-                            // الشخصيات (تبقى زي ما هي بدون عكس شكل)
                             Image("manWalk")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: geo.size.width * 0.11)
-                                .scaleEffect(x: manForward ? 1 : -1) // ما غيرناه
+                                .frame(width: charW)
+                                .scaleEffect(x: manForward ? 1 : -1)
                                 .position(
                                     x: trackStartX + (trackWidth * manProgress),
-                                    y: trackHeight * 0.65
+                                    y: manY
                                 )
 
                             Image("womanWalk")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: geo.size.width * 0.11)
-                                .scaleEffect(x: womanForward ? 1 : -1) // ما غيرناه
+                                .frame(width: charW)
+                                .scaleEffect(x: womanForward ? 1 : -1)
                                 .position(
                                     x: trackStartX + (trackWidth * womanProgress),
-                                    y: trackHeight * 0.80
+                                    y: womanY
                                 )
                         }
                         .frame(height: trackHeight)
-                        .environment(\.layoutDirection, .leftToRight) // ✅ هذا هو المهم
+                        .environment(\.layoutDirection, .leftToRight)
 
-                        // تشغيل/إيقاف
+                        Spacer(minLength: isLandscape ? geo.size.height * 0.02 : geo.size.height * 0.03)
+
+                        // ✅ أزرار التشغيل (يمين شوي)
                         HStack(spacing: 14) {
                             Button {
                                 if !manFinished { manAuto.toggle() }
@@ -148,9 +173,10 @@ struct SaiInteractionView: View {
                                     .cornerRadius(10)
                             }
                         }
-                        .padding(.top, 2)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .offset(x: buttonsShiftRight)
 
-                        // تحكم يدوي
+                        // ✅ التحكم اليدوي (يمين شوي)
                         HStack(spacing: 22) {
                             manualControl(
                                 title: "تحريك الرجل",
@@ -164,7 +190,9 @@ struct SaiInteractionView: View {
                                 rightAction: { moveWoman(by: 0.05) }
                             )
                         }
+                        .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 6)
+                        .offset(x: buttonsShiftRight)
 
                         if showArrow {
                             Button {
@@ -175,15 +203,7 @@ struct SaiInteractionView: View {
                                     .font(.system(size: 32, weight: .bold))
                                     .foregroundColor(.white)
                                     .padding(22)
-                                    .background(
-                                        Circle().fill(
-                                            LinearGradient(
-                                                colors: [Color("Color1"), Color("Color1")],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                    )
+                                    .background(Circle().fill(Color("Color1")))
                                     .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 4)
                                     .scaleEffect(pulseArrow ? 1.15 : 1)
                             }
@@ -194,13 +214,15 @@ struct SaiInteractionView: View {
                                     pulseArrow = true
                                 }
                             }
-                            .padding(.top, 6)
+                            .padding(.top, 8)
                         }
 
-                        Spacer(minLength: 10)
+                        Spacer(minLength: 14)
                     }
                     .padding(.horizontal, geo.size.width * 0.05)
                     .padding(.bottom, 10)
+                    .frame(minHeight: geo.size.height * 0.98, alignment: .top)
+                    .foregroundColor(textColor)
                 }
             }
             .onReceive(timer) { _ in
@@ -289,6 +311,7 @@ struct SaiInteractionView: View {
         if manRounds >= 7 && !manSpoken {
             manFinished = true
             manAuto = false
+            manRounds = 7 // ✅ تثبيت على 7
             speak("تم الانتهاء من السعي للرجل")
             manSpoken = true
         }
@@ -312,6 +335,7 @@ struct SaiInteractionView: View {
         if womanRounds >= 7 && !womanSpoken {
             womanFinished = true
             womanAuto = false
+            womanRounds = 7 // ✅ تثبيت على 7
             speak("تم الانتهاء من السعي للمرأة")
             womanSpoken = true
         }
