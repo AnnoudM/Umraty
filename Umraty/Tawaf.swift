@@ -1,31 +1,30 @@
+
+
 import SwiftUI
 import AVFoundation
 
 struct Tawaf: View {
 
     let selectedGender: ChildGender
-    let onComplete: () -> Void   // ✅ جديد
+    let onComplete: () -> Void
 
     private let centerXOffset: CGFloat = 0.60
-    private let centerYOffset: CGFloat = 280
-    private let radiusX: CGFloat = 650
-    private let radiusY: CGFloat = 590
+    private let centerYOffset: CGFloat = 260
+    private let tawafRadius: CGFloat = 260
     private let characterSize: CGFloat = 95
     private let kaabaYOffset: CGFloat = 120
 
     private let totalRounds: Int = 7
     private let roundDuration: Double = 5
 
-    @State private var progress: Double = 0.5
+    @State private var progress: Double = 0.0
     @State private var completedRounds: Int = 0
     @State private var showFront: Bool = true
     @State private var showBack: Bool = false
- 
+
     @State private var audioPlayer: AVAudioPlayer?
     @State private var audioStarted: Bool = false
     @State private var tawafStarted: Bool = false
-
-    // ✅ عشان نضمن ما ينادي onComplete مرتين
     @State private var didComplete: Bool = false
 
     private var walkFrame: String {
@@ -35,7 +34,7 @@ struct Tawaf: View {
     var body: some View {
         ZStack {
 
-            Image("BackGround")
+            Image("Background")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
@@ -48,7 +47,7 @@ struct Tawaf: View {
             Image("Kaaba")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 900)
+                .frame(width: 800)
                 .offset(y: kaabaYOffset)
                 .zIndex(1)
 
@@ -61,7 +60,7 @@ struct Tawaf: View {
                 if tawafStarted {
                     Text("Rounds \(min(completedRounds + 1, totalRounds)) / \(totalRounds)")
                         .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(.green)
+                        .foregroundColor(.blue)
                         .padding(.top, 24)
                 }
                 Spacer()
@@ -100,10 +99,11 @@ struct Tawaf: View {
         opacity: Double
     ) -> some View {
 
-        let angle = Angle.degrees(-progress * 360)
-        let x = cos(angle.radians) * radiusX
-        let y = sin(angle.radians) * radiusY
-        
+        let angle = Angle.degrees(progress * 360)
+
+        let x = cos(angle.radians) * tawafRadius
+        let y = sin(angle.radians) * tawafRadius
+
         let centerX = UIScreen.main.bounds.midX + centerXOffset
         let centerY = UIScreen.main.bounds.midY + centerYOffset
 
@@ -140,11 +140,12 @@ struct Tawaf: View {
         didComplete = false
         tawafStarted = true
         completedRounds = 0
-        progress = 0.5
+        progress = 0.0
         playTawafAudio()
         animateRound()
     }
 
+    // ✅ THIS is where navigation happens
     private func animateRound() {
 
         if completedRounds == totalRounds {
@@ -152,10 +153,13 @@ struct Tawaf: View {
             showBack = false
             stopTawafAudio()
 
-            // ✅ نحدث التقدم مرة وحدة
             if !didComplete {
                 didComplete = true
-                onComplete()
+
+                // optional 2-second pause before moving on
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    onComplete()
+                }
             }
             return
         }
