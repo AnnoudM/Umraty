@@ -29,6 +29,7 @@ struct IhramPage_suha_girl: View {
                 
                 HStack(spacing: 60) {
                     
+                    // ❌ Forbidden items
                     VStack(spacing: 30) {
                         Image("مقص")
                             .resizable()
@@ -53,11 +54,13 @@ struct IhramPage_suha_girl: View {
                         alignment: .top
                     )
                     
+                    // Girl without hijab
                     Image("بنت بدون حجاب")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 380)
                     
+                    // ✅ Correct (Hijab)
                     Image("حجاب البنت")
                         .resizable()
                         .scaledToFit()
@@ -75,13 +78,14 @@ struct IhramPage_suha_girl: View {
                 
                 Spacer()
                 
+                // 🔽 Bottom Arrow (Now pointing LEFT for Arabic)
                 if showArrow {
                     Button {
                         audioPlayer?.stop()
                         if progressGirl < 2 { progressGirl = 2 }
                         dismiss()
                     } label: {
-                        Image(systemName: "chevron.right")
+                        Image(systemName: "chevron.left") // 👈 flipped direction
                             .font(.system(size: 32, weight: .bold))
                             .foregroundColor(.white)
                             .padding(22)
@@ -111,7 +115,7 @@ struct IhramPage_suha_girl: View {
                 
                 playAudio()
                 
-                // allowed
+                // ✅ Animate allowed
                 withAnimation(.easeInOut(duration: 0.9)) {
                     zoomAllowed = true
                 }
@@ -121,7 +125,7 @@ struct IhramPage_suha_girl: View {
                     }
                 }
                 
-                // forbidden
+                // ❌ Animate forbidden
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     withAnimation(.easeInOut(duration: 0.8)) {
                         zoomForbidden = true

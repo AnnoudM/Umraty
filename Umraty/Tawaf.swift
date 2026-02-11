@@ -24,7 +24,6 @@ struct Tawaf: View {
     @State private var audioPlayer: AVAudioPlayer?
     @State private var audioStarted: Bool = false
     @State private var tawafStarted: Bool = false
-    @State private var didComplete: Bool = false
 
     private var walkFrame: String {
         selectedGender == .boy ? "BoyWalk 2" : "GirlWalk 2"
@@ -74,9 +73,7 @@ struct Tawaf: View {
 
                 } else if completedRounds < totalRounds {
 
-                    Text(String(format: NSLocalizedString("tawaf_rounds", comment: ""),
-                                "\(min(completedRounds + 1, totalRounds))",
-                                "\(totalRounds)"))
+                    Text("\(completedRounds)/\(totalRounds)")
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.white)
                         .padding(.horizontal, 28)
@@ -102,17 +99,37 @@ struct Tawaf: View {
                 Spacer()
             }
             .zIndex(3)
+
+            // 🔹 BACK BUTTON (only after 7/7)
+            if completedRounds == totalRounds {
+
+                VStack {
+                    Spacer()
+
+                    Button(action: {
+                        stopTawafAudio()
+                        onComplete()
+                    }) {
+                        Text("<")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 55, height: 55)
+                            .background(Color("Color1"))
+                            .clipShape(Circle())
+                            .shadow(radius: 4)
+                    }
+                    .padding(.bottom, 30)
+                }
+                .zIndex(4)
+            }
         }
         .onDisappear {
             stopTawafAudio()
         }
     }
 
-    // MARK: - Character
-    private func walkingCharacter(
-        flipped: Bool,
-        opacity: Double
-    ) -> some View {
+    // MARK: - Character Movement
+    private func walkingCharacter(flipped: Bool, opacity: Double) -> some View {
 
         let angle = Angle.degrees(progress * 360)
 
@@ -131,7 +148,7 @@ struct Tawaf: View {
             .opacity(opacity)
     }
 
-    // MARK: - Audio (FIXED & DEBUG SAFE)
+    // MARK: - Audio
     private func playTawafAudio() {
         guard !audioStarted else { return }
         audioStarted = true
@@ -141,18 +158,17 @@ struct Tawaf: View {
             : "tawafaudio_girl"
 
         guard let url = Bundle.main.url(forResource: audioName, withExtension: "mp3") else {
-            print("❌ Audio file NOT found:", audioName)
+            print("Audio file not found:", audioName)
             return
         }
 
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: url)
-            audioPlayer?.numberOfLoops = -1   // 🔁 loop during tawaf
+            audioPlayer?.numberOfLoops = -1
             audioPlayer?.prepareToPlay()
             audioPlayer?.play()
-            print("✅ Playing audio:", audioName)
         } catch {
-            print("❌ Audio error:", error.localizedDescription)
+            print("Audio error:", error.localizedDescription)
         }
     }
 
@@ -164,7 +180,6 @@ struct Tawaf: View {
 
     // MARK: - Tawaf Logic
     private func startTawaf() {
-        didComplete = false
         tawafStarted = true
         completedRounds = 0
         progress = 0.0
@@ -175,16 +190,7 @@ struct Tawaf: View {
     private func animateRound() {
 
         if completedRounds == totalRounds {
-            showFront = true
-            showBack = false
             stopTawafAudio()
-
-            if !didComplete {
-                didComplete = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                    onComplete()
-                }
-            }
             return
         }
 

@@ -1,3 +1,7 @@
+
+
+
+
 import SwiftUI
 import AVFoundation
 
@@ -30,6 +34,7 @@ struct IhramPageBoy_suha: View {
                 
                 HStack(spacing: 60) {
                     
+                    // ❌ Forbidden items
                     VStack(spacing: 30) {
                         Image("مقص")
                             .resizable()
@@ -54,11 +59,13 @@ struct IhramPageBoy_suha: View {
                         alignment: .top
                     )
                     
+                    // Boy without Ihram
                     Image("الولد بدون احرام")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 480)
                     
+                    // ✅ Correct (Ihram)
                     Image("احرام فقط")
                         .resizable()
                         .scaledToFit()
@@ -76,13 +83,14 @@ struct IhramPageBoy_suha: View {
                 
                 Spacer()
                 
+                // 🔽 Bottom Arrow (Now pointing LEFT for Arabic)
                 if showArrow {
                     Button {
                         audioPlayer?.stop()
                         if progressBoy < 2 { progressBoy = 2 }
                         dismiss()
                     } label: {
-                        Image(systemName: "chevron.right")
+                        Image(systemName: "chevron.left") // 👈 Changed here
                             .font(.system(size: 32, weight: .bold))
                             .foregroundColor(.white)
                             .padding(22)
@@ -104,6 +112,7 @@ struct IhramPageBoy_suha: View {
                 
                 playAudio()
                 
+                // ✅ Animate allowed
                 withAnimation(.easeInOut(duration: 0.9)) {
                     zoomAllowed = true
                 }
@@ -112,6 +121,8 @@ struct IhramPageBoy_suha: View {
                         zoomAllowed = false
                     }
                 }
+                
+         
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     withAnimation(.easeInOut(duration: 0.8)) {
